@@ -7,6 +7,11 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+//import Vue from 'vue'
+//import VueRouter from 'vue-router'
+
+//Vue.use(VueRouter)
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -19,11 +24,14 @@ Vue.component('todo', require('./components/Todo'))
 Vue.component('new-todo', require('./components/NewTodo.vue'))
 Vue.component('todo-list', require('./components/TodoList'))
 Vue.component('todo-app', require('./components/TodoApp'))
+Vue.component('Tasks', require('./components/Tasks'))
+Vue.component('dbnames', require('./components/dbnames'))
+
+
 
 import store from '../js/store'
 
 const app = new Vue({
     el: '#app',
     store
-
 });

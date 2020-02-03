@@ -6,17 +6,21 @@
         </header>
         <new-todo></new-todo>
         <todo-list></todo-list>
+        <tasks></tasks>
     </section>
 </template>
 <script>
     import newTodo from "../components/NewTodo.vue";
     import todoList from "../components/TodoList.vue";
+    import Tasks from "../components/Tasks.vue";
+
     import {mapGetters} from "vuex";
 
     export default {
         components: {
             newTodo,
-            todoList
+            todoList,
+            Tasks
         },
         name: "TodoApp",
         data() {
@@ -40,4 +44,3 @@
 </script>
 <style>
 </style>
-

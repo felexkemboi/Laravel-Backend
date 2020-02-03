@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
 use App\Events\TaskCreated;
 use App\Events\TaskRemoved;
@@ -27,6 +27,17 @@ class TaskController extends Controller
 		return response()->json("added");
 	}
 
+	public function home(Request $request){
+		$tasks = Task::all();
+		return response()->json($tasks);
+	}
+
+	public function dbnames(Request $request){
+		//$columns = Schema::Connection('todo')->getColumnListing('tasks'); // 'business' is your database connection
+		$columns =  Schema::getColumnListing('tasks');
+		//dd($columns);
+		return response()->json($columns);
+	}
 
 	public function update(Request $request, $id){
 		$task = Task::find($id);

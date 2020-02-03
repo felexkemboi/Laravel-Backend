@@ -19,6 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 }
 );
 
+Route::get('/','TaskController@home');
+Route::get('/dbnames','TaskController@dbnames');
 Route::get('todos','TaskController@fetchAll');
 Route::post('todos','TaskController@store');
 Route::put('todos/{id}','TaskController@update');

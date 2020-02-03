@@ -23,15 +23,14 @@ let actions = {
             console.log(err)
         })
     },
-    UPDATE_TODO({
-        commit
-    }, todo) {
+
+    UPDATE_TODO({commit}, todo) {
         axios.put(`/api/todos/${todo.id}`, todo).then(res => {
             if (res.data === 'updated')
                 console.log("updated")
         }).catch(err => console.log(err))
-
     },
+
     GET_TODOS({
         commit
     }) {
