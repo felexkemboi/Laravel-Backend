@@ -71,9 +71,8 @@
     <body>
 
           <div id="app">
-                    <!--<todo-app></todo-app> -->
-                    <Tasks></Tasks>
-                    <VueCsvImport></VueCsvImport>
+                    <!--<vuecsvimport></vuecsvimport> -->
+                    <upload></upload>
 
           </div>
 

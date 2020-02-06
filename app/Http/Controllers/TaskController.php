@@ -32,6 +32,16 @@ class TaskController extends Controller
 		return response()->json($tasks);
 	}
 
+	public function recievedata(Request $request){
+		return response() ->json([$request->all()]);
+
+		//dd($yes);
+	}
+
+	public function csv(Request $request){
+		dd("nenga muti beb");
+	}
+
 	public function dbnames(Request $request){
 		//$columns = Schema::Connection('todo')->getColumnListing('tasks'); // 'business' is your database connection
 		$columns =  Schema::getColumnListing('tasks');

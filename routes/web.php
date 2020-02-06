@@ -17,3 +17,6 @@ Route::get('/', function () {
 Route::get('/dbnames', function () {
     return view('dbnames');
 });
+Route::get('/csv', function () {
+    return view('csv');
+});

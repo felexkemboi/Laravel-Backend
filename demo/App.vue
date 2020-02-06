@@ -1,9 +1,10 @@
 <template>
     <div id="app">
+        <!--<img alt="Vue logo" src="./assets/logo.png"/>-->
         <div class="container">
             <div class="row mt-5 text-center">
                 <div class="col-6 offset-3">
-                    <!--<a href="./csv-sample.csv" target="_blank">Parse  CSV File </a> -->
+                    <!--<a href="./csv-sample.csv" target="_blank">Parse  CSV File </a>-->
                     <h2>Welcome!</h2>
                 </div>
             </div>
@@ -17,9 +18,7 @@
                 <div class="row mt-5">
                     <div class="col-8 offset-2">
                         <h4 class="mb-4">Upload the CSV File below</h4>
-                        <vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>
-                        <!--<vue-csv-import v-model="csv" :map-fields="map" :key="map"/> -->
-
+                        <vue-csv-import v-model="csv" :map-fields="['Name', 'Phone','Gender','Email']"></vue-csv-import>
                         <div class="mt-2">
                             {{ csv }}
                         </div>
@@ -36,18 +35,7 @@
         data() {
             return {
                 csv: null,
-                maps:null,
             };
-        },
-        created(){
-          console.log("yes bna")
-          axios.get("http://127.0.0.1:8000/api/dbnames")
-            .then(res => {
-              this.maps = res.data;
-              //console.log(this.maps)
-            }).catch(err => {
-              console.log(err);
-            });
         }
     };
 </script>

@@ -1,3 +1,28 @@
+<!--<template>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card card-default">
+                    <div class="card-header">Example Component</div>
+
+                    <div class="card-body">
+                        I'm an example component.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    name :"VueCsvImport"
+    export default {
+        mounted() {
+            console.log('Component mounted.')
+        }
+    }
+</script> -->
+
 <template>
     <div class="vue-csv-uploader">
         <div class="form">
@@ -54,7 +79,12 @@
 
 
 
+
                     </table>
+
+                                            <div class="mt-2">
+                                                {{ data }}
+                                            </div>
                     <div class="form-group" v-if="url">
                         <slot name="submit" :submit="submit">
                             <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
@@ -79,7 +109,7 @@
                 type: String
             },
             mapFields: {
-                required: true
+                required: false //true
             },
             callback: {
                 type: Function,
@@ -162,6 +192,7 @@
             //console.log(this.form.csv)
 
 
+
             if (_.isArray(this.mapFields)) {
                 this.fieldsToMap = _.map(this.mapFields, (item) => {
                     return {
@@ -199,16 +230,19 @@
             },
             chekthis(){
               const _this = this;
-              this.$emit('input', this.form.csv);
+              //this.$emit('input', this.form.csv);
               console.log(this.form.csv);
               console.log('The number of items in my CSV is ' + this.form.csv.length);
 
-              axios.post('http://127.0.0.1:5000/vue', this.form.csv)
+              axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
               .then((response) => {
                   this.data = response.data
-                  console.log('Ushoga tu...');
-                  console.log(this.data)
+                  //this.data = this.form.csv
+                  console.log(this.form.csv.data)
+                  this.data = response.data
+                  console.log("This was successfully done")
                 })
+                .catch(err => { console.log(err)});
             },
 
 
@@ -303,3 +337,30 @@
         },
     };
 </script>
+
+
+<style>
+    #app {
+        font-family: "Avenir", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 60px;
+    }
+
+    .container {
+        text-align: left;
+    }
+
+    pre code {
+        background-color: #eee;
+        border: 1px solid #999;
+        display: block;
+        padding: 20px;
+    }
+
+    #app .form {
+        text-align: left;
+    }
+</style>
