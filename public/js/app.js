@@ -61020,9 +61020,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
 
 
 
@@ -62019,14 +62016,6 @@ var render = function() {
                 _vm._v(
                   "\n                                            " +
                     _vm._s(_vm.data) +
-                    "\n                                        "
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "mt-2" }, [
-                _vm._v(
-                  "\n                                            " +
-                    _vm._s(_vm.csv) +
                     "\n                                        "
                 )
               ]),
