@@ -236,10 +236,12 @@
 
               axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
               .then((response) => {
-                  this.data = response.data
-                  //this.data = this.form.csv
-                  console.log(this.form.csv.data)
-                  this.data = response.data
+                  this.data = response
+                  console.log("Data sent to http://127.0.0.1:8000/api/csv ")
+                  this.data = this.form.csv
+                  //console.log(this.form.csv)
+                  //this.data = response.data
+                  console.log(response.data)
                   console.log("This was successfully done")
                 })
                 .catch(err => { console.log(err)});

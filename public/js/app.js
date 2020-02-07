@@ -61020,6 +61020,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 
@@ -61169,10 +61172,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log('The number of items in my CSV is ' + this.form.csv.length);
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('http://127.0.0.1:8000/api/csv', this.form.csv).then(function (response) {
-                _this2.data = response.data;
-                //this.data = this.form.csv
-                console.log(_this2.form.csv.data);
-                _this2.data = response.data;
+                _this2.data = response;
+                console.log("Data sent to http://127.0.0.1:8000/api/csv ");
+                _this2.data = _this2.form.csv;
+                //console.log(this.form.csv)
+                //this.data = response.data
+                console.log(response.data);
                 console.log("This was successfully done");
             }).catch(function (err) {
                 console.log(err);
@@ -62014,6 +62019,14 @@ var render = function() {
                 _vm._v(
                   "\n                                            " +
                     _vm._s(_vm.data) +
+                    "\n                                        "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "mt-2" }, [
+                _vm._v(
+                  "\n                                            " +
+                    _vm._s(_vm.csv) +
                     "\n                                        "
                 )
               ]),
