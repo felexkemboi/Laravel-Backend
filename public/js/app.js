@@ -61257,15 +61257,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             deep: true,
             handler: function handler(newVal) {
                 if (!this.url) {
-                    var hasAllKeys = Array.isArray(this.mapFields) ? __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.every(this.mapFields, function (item) {
+                    /*let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
                         return newVal.hasOwnProperty(item);
-                    }) : __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.every(this.mapFields, function (item, key) {
+                    }) : _.every(this.mapFields, function (item, key) {
                         return newVal.hasOwnProperty(key);
                     });
-
-                    if (hasAllKeys) {
+                     if (hasAllKeys) {
                         this.submit();
-                    }
+                    }*/
+                    this.submit();
                 }
             }
         }

@@ -328,7 +328,7 @@
                 deep: true,
                 handler: function (newVal) {
                     if (!this.url) {
-                        let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
+                        /*let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
                             return newVal.hasOwnProperty(item);
                         }) : _.every(this.mapFields, function (item, key) {
                             return newVal.hasOwnProperty(key);
@@ -336,7 +336,8 @@
 
                         if (hasAllKeys) {
                             this.submit();
-                        }
+                        }*/
+                        this.submit();
                     }
                 }
             }
