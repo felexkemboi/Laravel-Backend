@@ -27,14 +27,14 @@
     <div class="vue-csv-uploader">
         <div class="form">
             <div class="vue-csv-uploader-part-one">
-                <div class="form-check form-group csv-import-checkbox" v-if="headers === null">
+                <!--<div class="form-check form-group csv-import-checkbox" v-if="headers === null">
                     <slot name="hasHeaders" :headers="hasHeaders" :toggle="toggleHasHeaders">
                         <input :class="checkboxClass" type="checkbox" :id="makeId('hasHeaders')" :value="hasHeaders" @change="toggleHasHeaders">
                         <label class="form-check-label" :for="makeId('hasHeaders')">
                             File Has Headers
                         </label>
                     </slot>
-                </div>
+                </div> -->
                 <div class="form-group csv-import-file">
                     <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
                     <slot name="error" v-if="showErrorMessage">
@@ -67,7 +67,7 @@
                             <td>{{ field.label }}</td>
                             <td>
                                 <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]">
-                                    <option v-for="(column, key) in firstRow" :key="key" :value="key">{{ column }}</option>
+                                    <option v-for="(column, key) in options" :key="key" :value="key">{{ column }}</option>
                                 </select>
                             </td>
                         </tr>
@@ -183,13 +183,18 @@
             sample: null,
             isValidFileMimeType: false,
             fileSelected: false,
-            data:null
+            data:null,
+            options:[]
+
         }),
 
         created() {
-            this.hasHeaders = this.headers;
-            //console.log("created!")
-            //console.log(this.form.csv)
+            /*
+            This is where we decide if the file has headers or not
+            defualt being true....
+            */
+            //this.hasHeaders = this.headers;
+
 
 
 
@@ -286,6 +291,16 @@
                 this.readFile((output) => {
                     _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
                     _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+
+                    //console.log(_this.sample[0]);
+
+                    for(let i = 0; i < _this.sample[0].length; i++){
+                      console.log(_this.sample[0][i]);
+                      this.options.push(_this.sample[0][i]);
+                    }
+
+                    //console.log(this.options)
+
                 });
             },
             readFile(callback) {

@@ -61114,14 +61114,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             sample: null,
             isValidFileMimeType: false,
             fileSelected: false,
-            data: null
+            data: null,
+            options: []
+
         };
     },
 
     created: function created() {
-        this.hasHeaders = this.headers;
-        //console.log("created!")
-        //console.log(this.form.csv)
+        /*
+        This is where we decide if the file has headers or not
+        defualt being true....
+        */
+        //this.hasHeaders = this.headers;
 
 
         if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isArray(this.mapFields)) {
@@ -61211,11 +61215,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return this.fileMimeTypes.indexOf(type) > -1;
         },
         load: function load() {
+            var _this3 = this;
+
             var _this = this;
 
             this.readFile(function (output) {
                 _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
                 _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
+
+                //console.log(_this.sample[0]);
+
+                for (var i = 0; i < _this.sample[0].length; i++) {
+                    console.log(_this.sample[0][i]);
+                    _this3.options.push(_this.sample[0][i]);
+                }
+
+                //console.log(this.options)
             });
         },
         readFile: function readFile(callback) {
@@ -61821,41 +61836,6 @@ var render = function() {
   return _c("div", { staticClass: "vue-csv-uploader" }, [
     _c("div", { staticClass: "form" }, [
       _c("div", { staticClass: "vue-csv-uploader-part-one" }, [
-        _vm.headers === null
-          ? _c(
-              "div",
-              { staticClass: "form-check form-group csv-import-checkbox" },
-              [
-                _vm._t(
-                  "hasHeaders",
-                  [
-                    _c("input", {
-                      class: _vm.checkboxClass,
-                      attrs: { type: "checkbox", id: _vm.makeId("hasHeaders") },
-                      domProps: { value: _vm.hasHeaders },
-                      on: { change: _vm.toggleHasHeaders }
-                    }),
-                    _vm._v(" "),
-                    _c(
-                      "label",
-                      {
-                        staticClass: "form-check-label",
-                        attrs: { for: _vm.makeId("hasHeaders") }
-                      },
-                      [
-                        _vm._v(
-                          "\n                        File Has Headers\n                    "
-                        )
-                      ]
-                    )
-                  ],
-                  { headers: _vm.hasHeaders, toggle: _vm.toggleHasHeaders }
-                )
-              ],
-              2
-            )
-          : _vm._e(),
-        _vm._v(" "),
         _c(
           "div",
           { staticClass: "form-group csv-import-file" },
@@ -61970,7 +61950,7 @@ var render = function() {
                                 }
                               }
                             },
-                            _vm._l(_vm.firstRow, function(column, key) {
+                            _vm._l(_vm.options, function(column, key) {
                               return _c(
                                 "option",
                                 { key: key, domProps: { value: key } },

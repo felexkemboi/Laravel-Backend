@@ -33,9 +33,8 @@ class TaskController extends Controller
 	}
 
 	public function recievedata(Request $request){
+		print_r($request->all());
 		return response() ->json([$request->all()]);
-
-		//dd($yes);
 	}
 
 	public function csv(Request $request){
