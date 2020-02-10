@@ -61151,7 +61151,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this = this;
             //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
             this.form.csv = this.buildMappedCsv();
-            console.log("yES JUST DID IT");
             if (this.url) {
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post(this.url, this.form).then(function (response) {
                     _this.callback(response);
@@ -61169,7 +61168,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             var _this = this;
             //this.$emit('input', this.form.csv);
-            console.log(this.form.csv);
+            //console.log(this.form.csv);
             console.log('The number of items in my CSV is ' + this.form.csv.length);
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('http://127.0.0.1:8000/api/csv', this.form.csv).then(function (response) {

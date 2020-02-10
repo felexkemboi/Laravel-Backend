@@ -220,7 +220,6 @@
                 const _this = this;
                 //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
                 this.form.csv = this.buildMappedCsv();
-                console.log("yES JUST DID IT")
                 if (this.url) {
                     axios.post(this.url, this.form).then(response => {
                         _this.callback(response);
@@ -236,7 +235,7 @@
             chekthis(){
               const _this = this;
               //this.$emit('input', this.form.csv);
-              console.log(this.form.csv);
+              //console.log(this.form.csv);
               console.log('The number of items in my CSV is ' + this.form.csv.length);
 
               axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
