@@ -66,8 +66,9 @@
                         <tr v-for="(field, key) in fieldsToMap" :key="key">
                             <td>{{ field.label }}</td>
                             <td>
-                                <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]">
-                                    <option v-for="(column, key) in options" :key="key" :value="key">{{ column }}</option>
+                                <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]" @input="handleValueChange">
+                                    <option v-for="(column, key) in options" :key="key" :value="key" :disabled="!!isUsed[key]">{{ column }}</option>
+                                    <!--<option v-for="(option, index) in options" :key="index" :disabled="!!isUsed[option]" :value="option">{{ option }}</option>-->
                                 </select>
                             </td>
                         </tr>
@@ -184,7 +185,8 @@
             isValidFileMimeType: false,
             fileSelected: false,
             data:null,
-            options:[]
+            options:[],
+            isUsed: {}
 
         }),
 
@@ -320,6 +322,15 @@
             },
             makeId(id) {
                 return `${id}${this._uid}`;
+            },
+            handleValueChange(e) {
+              const option = e.target.value
+              // do your smart logic here
+              // bra, bra, bra,,,,
+              // store click history at the end
+              this.isUsed = {
+                ...this.isUsed,[option]: true
+              };
             }
         },
         watch: {
@@ -344,6 +355,10 @@
         computed: {
             firstRow() {
                 return _.get(this, "sample.0");
+            },
+            usedItems() {
+              const vm = this;
+              return this.options.filter(o => !!vm.isUsed[o])
             },
             showErrorMessage() {
                 return this.fileSelected && !this.isValidFileMimeType;

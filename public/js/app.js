@@ -60922,6 +60922,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_papaparse___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_papaparse__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_mime_types__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_mime_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_mime_types__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
 //
 //
 //
@@ -61115,7 +61120,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             isValidFileMimeType: false,
             fileSelected: false,
             data: null,
-            options: []
+            options: [],
+            isUsed: {}
 
         };
     },
@@ -61249,6 +61255,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         makeId: function makeId(id) {
             return '' + id + this._uid;
+        },
+        handleValueChange: function handleValueChange(e) {
+            var option = e.target.value;
+            // do your smart logic here
+            // bra, bra, bra,,,,
+            // store click history at the end
+            this.isUsed = _extends({}, this.isUsed, _defineProperty({}, option, true));
         }
     },
     watch: {
@@ -61272,6 +61285,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         firstRow: function firstRow() {
             return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(this, "sample.0");
+        },
+        usedItems: function usedItems() {
+            var vm = this;
+            return this.options.filter(function (o) {
+                return !!vm.isUsed[o];
+            });
         },
         showErrorMessage: function showErrorMessage() {
             return this.fileSelected && !this.isValidFileMimeType;
@@ -61929,6 +61948,7 @@ var render = function() {
                               staticClass: "form-control",
                               attrs: { name: "csv_uploader_map_" + key },
                               on: {
+                                input: _vm.handleValueChange,
                                 change: function($event) {
                                   var $$selectedVal = Array.prototype.filter
                                     .call($event.target.options, function(o) {
@@ -61952,7 +61972,11 @@ var render = function() {
                             _vm._l(_vm.options, function(column, key) {
                               return _c(
                                 "option",
-                                { key: key, domProps: { value: key } },
+                                {
+                                  key: key,
+                                  attrs: { disabled: !!_vm.isUsed[key] },
+                                  domProps: { value: key }
+                                },
                                 [_vm._v(_vm._s(column))]
                               )
                             }),
