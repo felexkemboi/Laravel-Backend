@@ -3,25 +3,72 @@
         <div class="container">
             <div class="row mt-5 text-center">
                 <div class="col-6 offset-3">
-                    <!--<a href="./csv-sample.csv" target="_blank">Parse  CSV File </a> -->
                     <h2>Welcome!</h2>
                 </div>
             </div>
             <section class="py-5">
                 <div class="row mt-5">
                     <div class="col-8 offset-2">
-                        <!--<h4>Source:</h4>
-                        <pre><code>&lt;vue-csv-import v-model="csv" :map-fields="['name', 'age']"&gt;&lt;/vue-csv-import&gt;</code></pre>-->
-                    </div>
-                </div>
-                <div class="row mt-5">
-                    <div class="col-8 offset-2">
                         <h4 class="mb-4">Upload the CSV File below</h4>
-                        <vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>
-                        <!--<vue-csv-import v-model="csv" :map-fields="map" :key="map"/> -->
-
+                        <!--<vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>-->
+                        <div class="vue-csv-uploader">
+                            <div class="form">
+                                <div class="vue-csv-uploader-part-one">
+                                    <div class="form-group csv-import-file">
+                                        <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
+                                        <slot name="error" v-if="showErrorMessage">
+                                            <div class="invalid-feedback d-block">
+                                                File type is invalid
+                                            </div>
+                                        </slot>
+                                    </div>
+                                    <div class="form-group">
+                                        <slot name="next" :load="load">
+                                            <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load">
+                                                {{ loadBtnText }}
+                                            </button>
+                                        </slot>
+                                    </div>
+                                </div>
+                                <div class="vue-csv-uploader-part-two">
+                                    <div class="vue-csv-mapping" v-if="sample">
+                                        <table :class="tableClass">
+                                            <slot name="thead">
+                                                <thead>
+                                                <tr>
+                                                    <th>Field</th>
+                                                    <th>CSV Column</th>
+                                                </tr>
+                                                </thead>
+                                            </slot>
+                                            <tbody>
+                                            <tr v-for="(field, key) in fieldsToMap" :key="key">
+                                                <td>{{ field.label }}</td>
+                                                <td>
+                                                    <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]" @input="handleValueChange">
+                                                        <option v-for="(column, key) in options" :key="key" :value="key" :disabled="!!isUsed[key]">{{ column }}</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                            <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis">
+                                                {{ chekiBtnText }}
+                                            </button>
+                                        </table>
+                                        <div class="mt-2">
+                                              <!--{{ data }}-->
+                                        </div>
+                                        <div class="form-group" v-if="url">
+                                            <slot name="submit" :submit="submit">
+                                                <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
+                                            </slot>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mt-2">
-                            {{ csv }}
+                            <!--{{ csv }}-->
                         </div>
                     </div>
                 </div>
@@ -30,6 +77,7 @@
     </div>
 </template>
 
+<!--
 <script>
     export default {
         name: "app",
@@ -49,6 +97,295 @@
               console.log(err);
             });
         }
+    };
+</script>
+-->
+<script>
+    import _ from 'lodash';
+    import axios from 'axios';
+    import Papa from 'papaparse';
+    import mimeTypes from "mime-types";
+
+    export default {
+      name: "app",
+
+        props: {
+            value: Array,
+            url: {
+                type: String
+            },
+            mapFields: {
+                required: false //true
+            },
+            callback: {
+                type: Function,
+                default: () => ({})
+            },
+            catch: {
+                type: Function,
+                default: () => ({})
+            },
+            finally: {
+                type: Function,
+                default: () => ({})
+            },
+            parseConfig: {
+                type: Object,
+                default() {
+                    return {};
+                }
+            },
+            headers: {
+                default: null
+            },
+            loadBtnText: {
+                type: String,
+                default: "Next"
+            },
+            chekiBtnText: {
+                type: String,
+                default: "Submit"
+            },
+            submitBtnText: {
+                type: String,
+                default: "Submit"
+            },
+            tableClass: {
+                type: String,
+                default: "table"
+            },
+            checkboxClass: {
+                type: String,
+                default: "form-check-input"
+            },
+            buttonClass: {
+                type: String,
+                default: "btn btn-primary"
+            },
+            inputClass: {
+                type: String,
+                default: "form-control-file"
+            },
+            validation: {
+                type: Boolean,
+                default: true,
+            },
+            fileMimeTypes: {
+                type: Array,
+                default: () => {
+                    return ["text/csv", "text/x-csv", "application/vnd.ms-excel", "text/plain"];
+                }
+            }
+        },
+
+        data: () => ({
+            form: {
+                csv: null,
+            },
+            csv: null,
+            maps:null,
+            fieldsToMap: [],
+            map: {},
+            hasHeaders: true,
+            csv: null,
+            sample: null,
+            isValidFileMimeType: false,
+            fileSelected: false,
+            data:null,
+            options:[],
+            isUsed: {}
+
+        }),
+
+        created() {
+            /*
+            This is where we decide if the file has headers or not
+            defualt being true....
+            */
+            //this.hasHeaders = this.headers;
+              console.log("yes bna")
+              axios.get("http://127.0.0.1:8000/api/dbnames")
+                .then(res => {
+                  this.maps = res.data;
+                  //console.log(this.maps)
+                }).catch(err => {
+                  console.log(err);
+                });
+
+
+
+
+            if (_.isArray(this.mapFields)) {
+                this.fieldsToMap = _.map(this.mapFields, (item) => {
+                    return {
+                        key: item,
+                        label: item
+                    };
+                });
+            } else {
+                this.fieldsToMap = _.map(this.mapFields, (label, key) => {
+                    return {
+                        key: key,
+                        label: label
+                    };
+                });
+            }
+        },
+
+        methods: {
+            submit() {
+                const _this = this;
+                //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
+                this.form.csv = this.buildMappedCsv();
+                if (this.url) {
+                    axios.post(this.url, this.form).then(response => {
+                        _this.callback(response);
+                    }).catch(response => {
+                        _this.catch(response);
+                    }).finally(response => {
+                        _this.finally(response);
+                    });
+                } else {
+                    _this.callback(this.form.csv);
+                }
+            },
+            onComplete: function(){
+              alert('Yay. Done!');
+            },
+            chekthis(){
+              const _this = this;
+              //this.$emit('input', this.form.csv);
+              //console.log(this.form.csv);
+              console.log('The number of items in my CSV is ' + this.form.csv.length);
+
+              axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
+              .then((response) => {
+                  this.data = response
+                  console.log("Data sent to http://127.0.0.1:8000/api/csv ")
+                  this.data = this.form.csv
+                  //console.log(this.form.csv)
+                  //this.data = response.data
+                  console.log(response.data)
+                  console.log("This was successfully done")
+                })
+                .catch(err => { console.log(err)});
+            },
+
+
+
+
+            buildMappedCsv() {
+                const _this = this;
+
+                let csv = this.hasHeaders ? _.drop(this.csv) : this.csv;
+
+                return _.map(csv, (row) => {
+                    let newRow = {};
+
+                    _.forEach(_this.map, (column, field) => {
+                        _.set(newRow, field, _.get(row, column));
+                    });
+
+                    return newRow;
+                });
+            },
+            validFileMimeType() {
+                let file = this.$refs.csv.files[0];
+                const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
+
+                if (file) {
+                    this.fileSelected = true;
+                    this.isValidFileMimeType = this.validation ? this.validateMimeType(mimeType) : true;
+                } else {
+                    this.isValidFileMimeType = !this.validation;
+                    this.fileSelected = false;
+                }
+            },
+            validateMimeType(type) {
+                return this.fileMimeTypes.indexOf(type) > -1;
+            },
+            load() {
+                const _this = this;
+
+                this.readFile((output) => {
+                    _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                    _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+
+                    //console.log(_this.sample[0]);
+
+                    for(let i = 0; i < _this.sample[0].length; i++){
+                      console.log(_this.sample[0][i]);
+                      this.options.push(_this.sample[0][i]);
+                    }
+                    console.log("should I map now?")
+
+                    //console.log(this.options)
+
+                });
+            },
+            readFile(callback) {
+                let file = this.$refs.csv.files[0];
+
+                if (file) {
+                    let reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function (evt) {
+                        callback(evt.target.result);
+                    };
+                    reader.onerror = function () {
+                    };
+                }
+            },
+            toggleHasHeaders() {
+                this.hasHeaders = !this.hasHeaders;
+            },
+            makeId(id) {
+                return `${id}${this._uid}`;
+            },
+            handleValueChange(e) {
+              const option = e.target.value
+              // do your smart logic here
+              // bra, bra, bra,,,,
+              // store click history at the end
+              this.isUsed = {
+                ...this.isUsed,[option]: true
+              };
+            }
+        },
+        watch: {
+            map: {
+                deep: true,
+                handler: function (newVal) {
+                    if (!this.url) {
+                        /*let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
+                            return newVal.hasOwnProperty(item);
+                        }) : _.every(this.mapFields, function (item, key) {
+                            return newVal.hasOwnProperty(key);
+                        });
+
+                        if (hasAllKeys) {
+                            this.submit();
+                        }*/
+                        this.submit();
+                    }
+                }
+            }
+        },
+        computed: {
+            firstRow() {
+                return _.get(this, "sample.0");
+            },
+            usedItems() {
+              const vm = this;
+              return this.options.filter(o => !!vm.isUsed[o])
+            },
+            showErrorMessage() {
+                return this.fileSelected && !this.isValidFileMimeType;
+            },
+            disabledNextButton() {
+                return !this.isValidFileMimeType;
+            }
+        },
     };
 </script>
 

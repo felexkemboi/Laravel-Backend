@@ -32,8 +32,9 @@ Vue.component('dbnames', require('./components/dbnames'))
 //Vue.use(VueCsvImportPlugin);
 import store from '../js/store'
 import { VueCsvImportPlugin } from "./VueCsvImport";
+import VueFormWizard from 'vue-form-wizard'
 Vue.config.silent = true
-
+Vue.use(VueFormWizard)
 Vue.use(VueCsvImportPlugin);
 
 const app = new Vue({
