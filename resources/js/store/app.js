@@ -20,7 +20,7 @@ window.Vue = require('vue');
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-Vue.component('upload', require('./components/upload'));
+ Vue.component('upload', require('./components/upload'));
 Vue.component('vuecsvimport', require('./components/VueCsvImport'));
 Vue.component('todo', require('./components/Todo'))
 Vue.component('new-todo', require('./components/NewTodo.vue'))
@@ -28,11 +28,16 @@ Vue.component('todo-list', require('./components/TodoList'))
 Vue.component('todo-app', require('./components/TodoApp'))
 Vue.component('Tasks', require('./components/Tasks'))
 Vue.component('dbnames', require('./components/dbnames'))
+Vue.component('form-wizard', require('./components/App'))
 
 
+//Vue.use(VueCsvImportPlugin);
 import store from '../js/store'
 import { VueCsvImportPlugin } from "./VueCsvImport";
 Vue.config.silent = true
+//import 'bulma/css/bulma.css';
+import "bulma/css/bulma.css"
+//import "@fortawesome/fontawesome-free/css/all.css"
 
 
 

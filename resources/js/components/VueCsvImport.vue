@@ -1,98 +1,69 @@
-<!--<template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card card-default">
-                    <div class="card-header">Example Component</div>
-
-                    <div class="card-body">
-                        I'm an example component.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script>
-    name :"VueCsvImport"
-    export default {
-        mounted() {
-            console.log('Component mounted.')
-        }
-    }
-</script> -->
 
 <template>
     <div class="vue-csv-uploader">
         <div class="form">
-            <div class="vue-csv-uploader-part-one">
-                <!--<div class="form-check form-group csv-import-checkbox" v-if="headers === null">
-                    <slot name="hasHeaders" :headers="hasHeaders" :toggle="toggleHasHeaders">
-                        <input :class="checkboxClass" type="checkbox" :id="makeId('hasHeaders')" :value="hasHeaders" @change="toggleHasHeaders">
-                        <label class="form-check-label" :for="makeId('hasHeaders')">
-                            File Has Headers
-                        </label>
-                    </slot>
-                </div> -->
-                <div class="form-group csv-import-file">
-                    <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
-                    <slot name="error" v-if="showErrorMessage">
-                        <div class="invalid-feedback d-block">
-                            File type is invalid
-                        </div>
-                    </slot>
-                </div>
-                <div class="form-group">
-                    <slot name="next" :load="load">
-                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load">
-                            {{ loadBtnText }}
-                        </button>
-                    </slot>
-                </div>
-            </div>
-            <div class="vue-csv-uploader-part-two">
-                <div class="vue-csv-mapping" v-if="sample">
-                    <table :class="tableClass">
-                        <slot name="thead">
-                            <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>CSV Column</th>
-                            </tr>
-                            </thead>
-                        </slot>
-                        <tbody>
-                        <tr v-for="(field, key) in fieldsToMap" :key="key">
-                            <td>{{ field.label }}</td>
-                            <td>
-                                <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]" @input="handleValueChange">
-                                    <option v-for="(column, key) in options" :key="key" :value="key" :disabled="!!isUsed[key]">{{ column }}</option>
-                                    <!--<option v-for="(option, index) in options" :key="index" :disabled="!!isUsed[option]" :value="option">{{ option }}</option>-->
-                                </select>
-                            </td>
-                        </tr>
-                        </tbody>
-                        <!--Just testing waters -->
-                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis">
-                            {{ chekiBtnText }}
-                        </button>
-
-
-
-
-                    </table>
-
-                                            <div class="mt-2">
-                                                {{ data }}
-                                            </div>
-                    <div class="form-group" v-if="url">
-                        <slot name="submit" :submit="submit">
-                            <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
-                        </slot>
-                    </div>
-                </div>
-            </div>
+          <form-wizard color="#33FF93 ">
+            <tab-content title="Upload your File"> <!--:before-change="load"-->
+              <div class="vue-csv-uploader-part-one">
+                  <div class="form-group csv-import-file">
+                      <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
+                      <slot name="error" v-if="showErrorMessage">
+                          <div class="invalid-feedback d-block">
+                              File type is invalid
+                          </div>
+                      </slot>
+                  </div>
+                  <div class="form-group">
+                      <slot name="next" :load="load">
+                          <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load">
+                              {{ loadBtnText }}
+                          </button>
+                      </slot>
+                  </div>
+              </div>
+            </tab-content>
+            <tab-content title="Match Columns">
+              <div class="vue-csv-uploader-part-two">
+                  <div class="vue-csv-mapping" v-if="sample">
+                      <table :class="tableClass">
+                          <slot name="thead">
+                              <thead>
+                              <tr>
+                                  <th>Field</th>
+                                  <th>CSV Column</th>
+                              </tr>
+                              </thead>
+                          </slot>
+                          <tbody>
+                          <tr v-for="(field, key) in fieldsToMap" :key="key">
+                              <td>{{ field.label }}</td>
+                              <td>
+                                  <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]" @input="handleValueChange">
+                                      <option v-for="(column, key) in options" :key="key" :value="key" :disabled="!!isUsed[key]">{{ column }}</option>
+                                  </select>
+                              </td>
+                          </tr>
+                          </tbody>
+                          <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis">
+                              {{ chekiBtnText }}
+                          </button>
+                      </table>
+                      <div class="form-group" v-if="url">
+                          <slot name="submit" :submit="submit">
+                              <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
+                          </slot>
+                      </div>
+                  </div>
+              </div>
+            </tab-content>
+            <tab-content title="Report">
+            Uploaded Successfully!
+            <br>
+              <div class="mt-2">
+                {{ data }}
+              </div>
+            </tab-content>
+          </form-wizard>
         </div>
     </div>
 </template>
@@ -102,12 +73,22 @@
     import axios from 'axios';
     import Papa from 'papaparse';
     import mimeTypes from "mime-types";
+    import {FormWizard, TabContent} from 'vue-form-wizard'
+    import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
     export default {
         props: {
             value: Array,
             url: {
                 type: String
+            },
+            title: {
+              type: String,
+              default: ''
+            },
+            subtitle: {
+              type: String,
+              default: ''
             },
             mapFields: {
                 required: false //true
@@ -286,7 +267,7 @@
             validateMimeType(type) {
                 return this.fileMimeTypes.indexOf(type) > -1;
             },
-            load() {
+            load(){
                 const _this = this;
 
                 this.readFile((output) => {
@@ -301,6 +282,7 @@
                     }
 
                     //console.log(this.options)
+                   return true;
 
                 });
             },

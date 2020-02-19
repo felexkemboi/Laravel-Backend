@@ -17,8 +17,8 @@
                 <div class="row mt-5">
                     <div class="col-8 offset-2">
                         <h4 class="mb-4">Upload the CSV File below</h4>
-                        <vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>
-                        <!--<vue-csv-import v-model="csv" :map-fields="map" :key="map"/> -->
+                        <!--<vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>-->
+                        <vue-csv-import v-model="csv" :map-fields="map" :key="map"/> 
 
                         <div class="mt-2">
                             {{ csv }}
