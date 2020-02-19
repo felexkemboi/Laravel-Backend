@@ -60986,45 +60986,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -62017,9 +61978,9 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "mt-2" }, [
                 _vm._v(
-                  "\n                                            " +
+                  "\n                    " +
                     _vm._s(_vm.data) +
-                    "\n                                        "
+                    "\n                  "
                 )
               ]),
               _vm._v(" "),

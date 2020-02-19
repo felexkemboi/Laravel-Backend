@@ -1,40 +1,8 @@
-<!--<template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card card-default">
-                    <div class="card-header">Example Component</div>
-
-                    <div class="card-body">
-                        I'm an example component.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script>
-    name :"VueCsvImport"
-    export default {
-        mounted() {
-            console.log('Component mounted.')
-        }
-    }
-</script> -->
 
 <template>
     <div class="vue-csv-uploader">
         <div class="form">
             <div class="vue-csv-uploader-part-one">
-                <!--<div class="form-check form-group csv-import-checkbox" v-if="headers === null">
-                    <slot name="hasHeaders" :headers="hasHeaders" :toggle="toggleHasHeaders">
-                        <input :class="checkboxClass" type="checkbox" :id="makeId('hasHeaders')" :value="hasHeaders" @change="toggleHasHeaders">
-                        <label class="form-check-label" :for="makeId('hasHeaders')">
-                            File Has Headers
-                        </label>
-                    </slot>
-                </div> -->
                 <div class="form-group csv-import-file">
                     <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
                     <slot name="error" v-if="showErrorMessage">
@@ -68,24 +36,17 @@
                             <td>
                                 <select class="form-control" :name="`csv_uploader_map_${key}`" v-model="map[field.key]" @input="handleValueChange">
                                     <option v-for="(column, key) in options" :key="key" :value="key" :disabled="!!isUsed[key]">{{ column }}</option>
-                                    <!--<option v-for="(option, index) in options" :key="index" :disabled="!!isUsed[option]" :value="option">{{ option }}</option>-->
                                 </select>
                             </td>
                         </tr>
                         </tbody>
-                        <!--Just testing waters -->
                         <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis">
                             {{ chekiBtnText }}
                         </button>
-
-
-
-
                     </table>
-
-                                            <div class="mt-2">
-                                                {{ data }}
-                                            </div>
+                      <div class="mt-2">
+                        {{ data }}
+                      </div>
                     <div class="form-group" v-if="url">
                         <slot name="submit" :submit="submit">
                             <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
