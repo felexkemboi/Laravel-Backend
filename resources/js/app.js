@@ -48,6 +48,3 @@ const app = new Vue({
     el: '#app',
     store
 });
-/*
-"pusher": "^2.1.3",
-"pusher-js": "^4.3.1", */

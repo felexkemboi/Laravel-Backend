@@ -33372,9 +33372,6 @@ var app = new Vue({
   el: '#app',
   store: __WEBPACK_IMPORTED_MODULE_0__js_store__["a" /* default */]
 });
-/*
-"pusher": "^2.1.3",
-"pusher-js": "^4.3.1", */
 
 /***/ }),
 /* 27 */
@@ -61471,12 +61468,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
 
     created: function created() {
-        /*
-        This is where we decide if the file has headers or not
-        defualt being true....
-        */
-        //this.hasHeaders = this.headers;
-
 
         if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isArray(this.mapFields)) {
             this.fieldsToMap = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.map(this.mapFields, function (item) {
@@ -61497,6 +61488,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
     methods: {
+        click: function click() {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                _this2.$refs.upload.click().then(function (data) {
+                    _this2.isLoading = true;
+                    resolve(true);
+                }).catch(function (error) {
+                    console.log(err);
+                    reject(error);
+                    _this2.isLoading = true;
+                });
+            });
+        },
+        match: function match() {
+            var _this3 = this;
+
+            return new Promise(function (resolve, reject) {
+                _this3.$refs.columns.click().then(function (data) {
+                    _this3.isLoading = true;
+                    resolve(true);
+                }).catch(function (error) {
+                    console.log(err);
+                    reject(error);
+                    _this3.isLoading = true;
+                });
+            });
+        },
         submit: function submit() {
             var _this = this;
             //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
@@ -61514,19 +61533,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         },
         chekthis: function chekthis() {
-            var _this2 = this;
+            var _this4 = this;
 
+            this.$refs.wizard.changeTab(1, 2);
             var _this = this;
-            //this.$emit('input', this.form.csv);
-            //console.log(this.form.csv);
             console.log('The number of items in my CSV is ' + this.form.csv.length);
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('http://127.0.0.1:8000/api/csv', this.form.csv).then(function (response) {
-                _this2.data = response;
+                _this4.data = response;
                 console.log("Data sent to http://127.0.0.1:8000/api/csv ");
-                _this2.data = _this2.form.csv;
-                //console.log(this.form.csv)
-                //this.data = response.data
+                _this4.data = _this4.form.csv;
                 console.log(response.data);
                 console.log("This was successfully done");
             }).catch(function (err) {
@@ -61563,28 +61579,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         validateMimeType: function validateMimeType(type) {
             return this.fileMimeTypes.indexOf(type) > -1;
         },
-        click: function click() {
-            var elem = this.$els.upload;
-            elem.click();
-        },
         load: function load() {
-            var _this3 = this;
+            var _this5 = this;
 
+            this.$refs.wizard.changeTab(0, 1);
             var _this = this;
-            console.log(event);
-
             this.readFile(function (output) {
                 _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
                 _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
 
-                //console.log(_this.sample[0]);
-
                 for (var i = 0; i < _this.sample[0].length; i++) {
                     console.log(_this.sample[0][i]);
-                    _this3.options.push(_this.sample[0][i]);
+                    _this5.options.push(_this.sample[0][i]);
                 }
-
-                //console.log(this.options)
             });
         },
         readFile: function readFile(callback) {
@@ -61607,9 +61614,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         },
         handleValueChange: function handleValueChange(e) {
             var option = e.target.value;
-            // do your smart logic here
-            // bra, bra, bra,,,,
-            // store click history at the end
             this.isUsed = _extends({}, this.isUsed, _defineProperty({}, option, true));
         }
     },
@@ -62206,7 +62210,11 @@ var render = function() {
     [
       _c(
         "form-wizard",
-        { attrs: { color: "#48e79a" }, on: { "on-complete": _vm.onComplete } },
+        {
+          ref: "wizard",
+          attrs: { color: "#48e79a" },
+          on: { "on-complete": _vm.onComplete }
+        },
         [
           _c("h2", { attrs: { slot: "title" }, slot: "title" }, [
             _vm._v("Upload File")
@@ -62214,7 +62222,13 @@ var render = function() {
           _vm._v(" "),
           _c(
             "tab-content",
-            { attrs: { title: "Upload File", icon: "ti-check" } },
+            {
+              attrs: {
+                title: "Upload File",
+                icon: "ti-check",
+                "before-change": _vm.click
+              }
+            },
             [
               _c("div", { staticClass: "vue-csv-uploader-part-one" }, [
                 _c(
@@ -62260,14 +62274,12 @@ var render = function() {
                         _c(
                           "button",
                           {
-                            directives: [
-                              {
-                                name: "el",
-                                rawName: "v-el:upload",
-                                arg: "upload"
-                              }
-                            ],
+                            ref: "upload",
                             class: _vm.buttonClass,
+                            staticStyle: {
+                              display: "none",
+                              visibility: "hidden"
+                            },
                             attrs: {
                               type: "submit",
                               disabled: _vm.disabledNextButton
@@ -62299,7 +62311,13 @@ var render = function() {
           _vm._v(" "),
           _c(
             "tab-content",
-            { attrs: { title: "Match Columns", icon: "ti-settings" } },
+            {
+              attrs: {
+                title: "Match Columns",
+                icon: "ti-settings",
+                "before-change": _vm.match
+              }
+            },
             [
               _c("div", { staticClass: "vue-csv-uploader-part-two" }, [
                 _vm.sample
@@ -62388,12 +62406,15 @@ var render = function() {
                             0
                           ),
                           _vm._v(" "),
-                          _c("input"),
-                          _vm._v(" "),
                           _c(
                             "button",
                             {
+                              ref: "columns",
                               class: _vm.buttonClass,
+                              staticStyle: {
+                                display: "none",
+                                visibility: "hidden"
+                              },
                               attrs: {
                                 type: "submit",
                                 disabled: _vm.disabledNextButton
@@ -62415,42 +62436,7 @@ var render = function() {
                           )
                         ],
                         2
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "mt-2" }, [
-                        _vm._v(
-                          "\n                      " +
-                            _vm._s(_vm.data) +
-                            "\n                    "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _vm.url
-                        ? _c(
-                            "div",
-                            { staticClass: "form-group" },
-                            [
-                              _vm._t(
-                                "submit",
-                                [
-                                  _c("input", {
-                                    class: _vm.buttonClass,
-                                    attrs: { type: "submit" },
-                                    domProps: { value: _vm.submitBtnText },
-                                    on: {
-                                      click: function($event) {
-                                        $event.preventDefault()
-                                        return _vm.submit($event)
-                                      }
-                                    }
-                                  })
-                                ],
-                                { submit: _vm.submit }
-                              )
-                            ],
-                            2
-                          )
-                        : _vm._e()
+                      )
                     ])
                   : _vm._e()
               ])
@@ -62459,8 +62445,15 @@ var render = function() {
           _vm._v(" "),
           _c("tab-content", { attrs: { title: "Finish", icon: "ti-check" } }, [
             _vm._v(
-              "\n          Yuhuuu! This seems pretty damn simple\n        "
-            )
+              "\n          Yuhuuu! This seems pretty damn simple\n          "
+            ),
+            _c("br"),
+            _vm._v(" "),
+            _c("div", { staticClass: "mt-2" }, [
+              _vm._v(
+                "\n              " + _vm._s(_vm.data) + " yes\n            "
+              )
+            ])
           ])
         ],
         1

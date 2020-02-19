@@ -1,9 +1,9 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete" color="#48e79a">
+          <form-wizard @on-complete="onComplete" color="#48e79a" ref="wizard">
             <h2 slot="title">Upload File</h2>
-            <tab-content title="Upload File" icon="ti-check"  > <!--:before-change="load"-->
+            <tab-content title="Upload File" icon="ti-check"  :before-change="click">
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -14,15 +14,15 @@
                       </slot>
                   </div>
                   <div class="form-group">
-                      <slot name="next" :load="load">
-                          <button type="submit" :disabled="disabledNextButton" v-el:upload :class="buttonClass" @click.prevent="load">
+                      <slot name="next" :load="load" >
+                          <button   style="display:none;visibility:hidden;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load">
                               {{ loadBtnText }}
                           </button>
                       </slot>
                   </div>
               </div>
             </tab-content>
-            <tab-content title="Match Columns" icon="ti-settings">
+            <tab-content title="Match Columns" icon="ti-settings" :before-change="match">
               <div class="vue-csv-uploader-part-two">
                   <div class="vue-csv-mapping" v-if="sample">
                       <table :class="tableClass">
@@ -44,25 +44,25 @@
                               </td>
                           </tr>
                           </tbody>
-                          <input>
-                          <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis">
+                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis" ref="columns" style="display:none;visibility:hidden;">
                               {{ chekiBtnText }}
                           </button>
 
                       </table>
-                        <div class="mt-2">
-                          {{ data }}
-                        </div>
-                      <div class="form-group" v-if="url">
+                      <!--  <div class="form-group" v-if="url">
                           <slot name="submit" :submit="submit">
-                              <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText">
+                              <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText" style="display:none;visibility:hidden;">
                           </slot>
-                      </div>
+                      </div> -->
                   </div>
               </div>
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
               Yuhuuu! This seems pretty damn simple
+              <br>
+                <div class="mt-2">
+                  {{ data }} yes
+                </div>
             </tab-content>
           </form-wizard>
         </div>
@@ -164,14 +164,6 @@
         }),
 
         created() {
-            /*
-            This is where we decide if the file has headers or not
-            defualt being true....
-            */
-            //this.hasHeaders = this.headers;
-
-
-
 
             if (_.isArray(this.mapFields)) {
                 this.fieldsToMap = _.map(this.mapFields, (item) => {
@@ -191,6 +183,32 @@
         },
 
         methods: {
+          click(){
+                 return new Promise((resolve, reject) => {
+                     this.$refs.upload.click()
+                     .then(data => {
+                         this.isLoading = true
+                         resolve(true)
+                     }).catch(error => {
+                       console.log(err)
+                         reject(error)
+                       this.isLoading = true
+                     })
+                 })
+               },
+               match(){
+                      return new Promise((resolve, reject) => {
+                          this.$refs.columns.click()
+                          .then(data => {
+                              this.isLoading = true
+                              resolve(true)
+                          }).catch(error => {
+                            console.log(err)
+                              reject(error)
+                            this.isLoading = true
+                          })
+                      })
+                    },
             submit() {
                 const _this = this;
                 //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
@@ -208,9 +226,8 @@
                 }
             },
             chekthis(){
+              this.$refs.wizard.changeTab(1,2)
               const _this = this;
-              //this.$emit('input', this.form.csv);
-              //console.log(this.form.csv);
               console.log('The number of items in my CSV is ' + this.form.csv.length);
 
               axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
@@ -218,17 +235,11 @@
                   this.data = response
                   console.log("Data sent to http://127.0.0.1:8000/api/csv ")
                   this.data = this.form.csv
-                  //console.log(this.form.csv)
-                  //this.data = response.data
                   console.log(response.data)
                   console.log("This was successfully done")
                 })
                 .catch(err => { console.log(err)});
             },
-
-
-
-
             buildMappedCsv() {
                 const _this = this;
 
@@ -259,27 +270,17 @@
             validateMimeType(type) {
                 return this.fileMimeTypes.indexOf(type) > -1;
             },
-            click(){
-                 var elem = this.$els.upload
-                elem.click()
-            },
             load() {
+                this.$refs.wizard.changeTab(0,1)
                 const _this = this;
-                console.log(event)
-
                 this.readFile((output) => {
                     _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
                     _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
-
-                    //console.log(_this.sample[0]);
 
                     for(let i = 0; i < _this.sample[0].length; i++){
                       console.log(_this.sample[0][i]);
                       this.options.push(_this.sample[0][i]);
                     }
-
-                    //console.log(this.options)
-
                 });
             },
             readFile(callback) {
@@ -303,9 +304,6 @@
             },
             handleValueChange(e) {
               const option = e.target.value
-              // do your smart logic here
-              // bra, bra, bra,,,,
-              // store click history at the end
               this.isUsed = {
                 ...this.isUsed,[option]: true
               };
