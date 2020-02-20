@@ -61366,6 +61366,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 
 
 
@@ -62212,7 +62215,7 @@ var render = function() {
         "form-wizard",
         {
           ref: "wizard",
-          attrs: { color: "#48e79a" },
+          attrs: { color: "#48e79a", "error-color": "#a94442", squared: "" },
           on: { "on-complete": _vm.onComplete }
         },
         [
@@ -62225,7 +62228,7 @@ var render = function() {
             {
               attrs: {
                 title: "Upload File",
-                icon: "ti-check",
+                icon: "ti-user",
                 "before-change": _vm.click
               }
             },
@@ -62443,18 +62446,28 @@ var render = function() {
             ]
           ),
           _vm._v(" "),
-          _c("tab-content", { attrs: { title: "Finish", icon: "ti-check" } }, [
-            _vm._v(
-              "\n          Yuhuuu! This seems pretty damn simple\n          "
-            ),
-            _c("br"),
-            _vm._v(" "),
-            _c("div", { staticClass: "mt-2" }, [
+          _c(
+            "tab-content",
+            { attrs: { title: "Finish", icon: "ti-check" } },
+            [
               _vm._v(
-                "\n              " + _vm._s(_vm.data) + " yes\n            "
-              )
-            ])
-          ])
+                "\n          Yuhuuu! This seems pretty damn simple\n          "
+              ),
+              _c("v-divider", {
+                staticClass: "mx-4",
+                attrs: { inset: _vm.inset, vertical: "" }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "mt-2" }, [
+                _c("div", { staticClass: "panel-body" }, [
+                  _vm._v(
+                    "\n                " + _vm._s(_vm.data) + "\n              "
+                  )
+                ])
+              ])
+            ],
+            1
+          )
         ],
         1
       )

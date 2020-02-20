@@ -1,9 +1,9 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete" color="#48e79a" ref="wizard">
+          <form-wizard @on-complete="onComplete" color="#48e79a" error-color="#a94442" ref="wizard" squared>
             <h2 slot="title">Upload File</h2>
-            <tab-content title="Upload File" icon="ti-check"  :before-change="click">
+            <tab-content title="Upload File" icon="ti-user"  :before-change="click">
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -59,9 +59,12 @@
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
               Yuhuuu! This seems pretty damn simple
-              <br>
+              <v-divider class="mx-4" :inset="inset" vertical></v-divider>
                 <div class="mt-2">
-                  {{ data }} yes
+                  <div class="panel-body">
+                    {{ data }}
+                  </div>
+
                 </div>
             </tab-content>
           </form-wizard>
