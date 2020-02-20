@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Events\TaskCreated;
 use App\Events\TaskRemoved;
 use App\Task;
+use \Illuminate\Support\Arr;
+
 
 class TaskController extends Controller
 {
@@ -43,9 +45,32 @@ class TaskController extends Controller
 
 	public function dbnames(Request $request){
 		//$columns = Schema::Connection('todo')->getColumnListing('tasks'); // 'business' is your database connection
-		$columns =  Schema::getColumnListing('tasks');
-		//dd($columns);
-		return response()->json($columns);
+		$list_of_names_in_db = [];
+
+		$crud_names = [];
+
+		$tables = ['case_files','branches','debtors','phones','emails','employers','next_of_kins','guarantors'];
+
+		$names = ['loan_amount','contract_no','loan_taken_date','loan_due_date',
+							 'account_no','branch_title','debtor_name','debtor_id',
+							 'employee_email','employee_name','nok_name','nok_phone',
+							 'nok_address','nok_email','nok_contacts','gua_name','gua_email','gua_address'
+						 ];
+
+		foreach($tables as $table) {
+						 array_push($crud_names, Schema::getColumnListing($table));
+
+			}
+
+		$crud_names = Arr::collapse($crud_names);
+
+		foreach($crud_names as $name) {
+		    if(in_array($name,$names)) {
+		        array_push($list_of_names_in_db, $name);
+		    }
+		}
+
+		return response()->json($list_of_names_in_db);
 	}
 
 	public function update(Request $request, $id){
