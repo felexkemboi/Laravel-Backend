@@ -1,7 +1,7 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete" color="#48e79a" error-color="#a94442" ref="wizard" squared>
+          <form-wizard @on-complete="onComplete" color="#800000"  ref="wizard">
             <h2 slot="title">Upload File</h2>
             <tab-content title="Upload File" icon="ti-user"  :before-change="click">
               <div class="vue-csv-uploader-part-one">

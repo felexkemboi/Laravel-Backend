@@ -62215,7 +62215,7 @@ var render = function() {
         "form-wizard",
         {
           ref: "wizard",
-          attrs: { color: "#48e79a", "error-color": "#a94442", squared: "" },
+          attrs: { color: "#800000" },
           on: { "on-complete": _vm.onComplete }
         },
         [
