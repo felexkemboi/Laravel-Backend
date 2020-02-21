@@ -62623,7 +62623,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     created: function created() {
         var _this = this;
 
-        console.log("yes bna");
         axios.get("http://127.0.0.1:8000/api/dbnames").then(function (res) {
             _this.maps = res.data;
             //console.log(this.maps)
