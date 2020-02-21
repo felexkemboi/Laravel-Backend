@@ -238,7 +238,8 @@
                   this.data = response
                   console.log("Data sent to http://127.0.0.1:8000/api/csv ")
                   this.data = this.form.csv
-                  console.log(response.data)
+                  console.log(this.data)
+                  //console.log(response.data)
                   console.log("This was successfully done")
                 })
                 .catch(err => { console.log(err)});
@@ -281,7 +282,7 @@
                     _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
 
                     for(let i = 0; i < _this.sample[0].length; i++){
-                      console.log(_this.sample[0][i]);
+                      //console.log(_this.sample[0][i]);
                       this.options.push(_this.sample[0][i]);
                     }
                 });

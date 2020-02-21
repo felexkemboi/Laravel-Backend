@@ -7,6 +7,9 @@ use App\Events\TaskCreated;
 use App\Events\TaskRemoved;
 use App\Task;
 use \Illuminate\Support\Arr;
+//use App\Http\Controllers\Storage;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class TaskController extends Controller
@@ -49,10 +52,10 @@ class TaskController extends Controller
 
 		$crud_names = [];
 
-		$tables = ['case_files','branches','debtors','phones','emails','employers','next_of_kins','guarantors'];
+		$tables = ['debtors','case_files','branches','employers','guarantors','phones','emails','next_of_kins']; //,
 
 		$names = ['loan_amount','contract_no','loan_taken_date','loan_due_date',
-							 'account_no','branch_title','debtor_name','debtor_id',
+							 'account_no','branch_title','full_name','debtor_ID',
 							 'employee_email','employee_name','nok_name','nok_phone',
 							 'nok_address','nok_email','nok_contacts','gua_name','gua_email','gua_address'
 						 ];
@@ -69,6 +72,7 @@ class TaskController extends Controller
 		        array_push($list_of_names_in_db, $name);
 		    }
 		}
+		//Storage::disk('local')->put('data.json', json_encode($list_of_names_in_db));
 
 		return response()->json($list_of_names_in_db);
 	}

@@ -36,7 +36,6 @@
             };
         },
         created(){
-          console.log("yes bna")
           axios.get("http://127.0.0.1:8000/api/dbnames")
             .then(res => {
               this.maps = res.data;

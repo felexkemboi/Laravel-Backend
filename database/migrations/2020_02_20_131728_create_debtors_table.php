@@ -15,8 +15,8 @@ class CreateDebtorsTable extends Migration
     {
         Schema::create('debtors', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('debtor_name');
-            $table->tinyInteger('debtor_id');
+            $table->string('full_name');
+            $table->tinyInteger('debtor_ID');
             $table->timestamps();
         });
     }

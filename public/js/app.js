@@ -61546,7 +61546,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this4.data = response;
                 console.log("Data sent to http://127.0.0.1:8000/api/csv ");
                 _this4.data = _this4.form.csv;
-                console.log(response.data);
+                console.log(_this4.data);
+                //console.log(response.data)
                 console.log("This was successfully done");
             }).catch(function (err) {
                 console.log(err);
@@ -61592,7 +61593,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
 
                 for (var i = 0; i < _this.sample[0].length; i++) {
-                    console.log(_this.sample[0][i]);
+                    //console.log(_this.sample[0][i]);
                     _this5.options.push(_this.sample[0][i]);
                 }
             });
