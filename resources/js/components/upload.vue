@@ -12,10 +12,12 @@
 
                     </div>
                 </div>
-                <div class="row mt-5">
-                    <div class="col-8 offset-2">
+                <div class="row">
+                    <!--<div class="col-8 offset-2">-->
+                    <div>
                         <h4 class="mb-4">Upload the CSV File below</h4>
                         <vue-csv-import v-model="csv" :map-fields="maps" :key="maps"></vue-csv-import>
+
                         <div class="mt-2">
                             {{ csv }}
                         </div>
@@ -39,7 +41,6 @@
           axios.get("http://127.0.0.1:8000/api/dbnames")
             .then(res => {
               this.maps = res.data;
-              //console.log(this.maps)
             }).catch(err => {
               console.log(err);
             });

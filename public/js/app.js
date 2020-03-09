@@ -62611,6 +62611,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "app",
@@ -62625,7 +62627,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         axios.get("http://127.0.0.1:8000/api/dbnames").then(function (res) {
             _this.maps = res.data;
-            //console.log(this.maps)
         }).catch(function (err) {
             console.log(err);
         });
@@ -62647,10 +62648,9 @@ var render = function() {
       _c("section", { staticClass: "py-5" }, [
         _vm._m(1),
         _vm._v(" "),
-        _c("div", { staticClass: "row mt-5" }, [
+        _c("div", { staticClass: "row" }, [
           _c(
             "div",
-            { staticClass: "col-8 offset-2" },
             [
               _c("h4", { staticClass: "mb-4" }, [
                 _vm._v("Upload the CSV File below")
