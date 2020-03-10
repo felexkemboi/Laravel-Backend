@@ -1,9 +1,9 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete" color="#800000"  ref="wizard">
+          <form-wizard @on-complete="onComplete"  color="#1CD171" error-color="#1CD171" ref="wizard"> <!--color="#800000"--> 
             <h2 slot="title">Upload File</h2>
-            <tab-content title="Upload File" icon="ti-user"  :before-change="click">
+            <tab-content title="Upload File" icon="ti-file"  :before-change="click">
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -47,19 +47,13 @@
                         <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis" ref="columns" style="display:none;visibility:hidden;">
                               {{ chekiBtnText }}
                           </button>
-
                       </table>
-                      <!--  <div class="form-group" v-if="url">
-                          <slot name="submit" :submit="submit">
-                              <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText" style="display:none;visibility:hidden;">
-                          </slot>
-                      </div> -->
                   </div>
               </div>
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
-              Yuhuuu! This seems pretty damn simple
-              <v-divider class="mx-4" :inset="inset" vertical></v-divider>
+
+              <!--<v-divider class="mx-4" :inset="inset" vertical></v-divider>-->
                 <div class="mt-2">
                   <div class="panel-body">
                     {{ data }}
