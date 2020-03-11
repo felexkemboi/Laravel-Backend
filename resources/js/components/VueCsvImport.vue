@@ -1,7 +1,7 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete"  color="#1CD171" error-color="#1CD171" ref="wizard"> <!--color="#800000"--> 
+          <form-wizard @on-complete="onComplete"  color="#1CD171" error-color="#1CD171" ref="wizard" @on-error="handleErrorMessage"> <!--color="#800000"-->
             <h2 slot="title">Upload File</h2>
             <tab-content title="Upload File" icon="ti-file"  :before-change="click">
               <div class="vue-csv-uploader-part-one">
@@ -24,6 +24,9 @@
             </tab-content>
             <tab-content title="Match Columns" icon="ti-settings" :before-change="match">
               <div class="vue-csv-uploader-part-two">
+                <div v-if="errorMsg">
+                  <span class="error">{{errorMsg}}</span>
+                </div>
                   <div class="vue-csv-mapping" v-if="sample">
                       <table :class="tableClass">
                           <slot name="thead">
@@ -48,15 +51,16 @@
                               {{ chekiBtnText }}
                           </button>
                       </table>
+
                   </div>
               </div>
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
 
-              <!--<v-divider class="mx-4" :inset="inset" vertical></v-divider>-->
                 <div class="mt-2">
                   <div class="panel-body">
                     {{ data }}
+
                   </div>
 
                 </div>
@@ -142,11 +146,11 @@
                 }
             }
         },
-
         data: () => ({
             form: {
                 csv: null,
             },
+            errorMsg: null,
             fieldsToMap: [],
             map: {},
             hasHeaders: true,
@@ -159,7 +163,6 @@
             isUsed: {}
 
         }),
-
         created() {
 
             if (_.isArray(this.mapFields)) {
@@ -178,7 +181,6 @@
                 });
             }
         },
-
         methods: {
           click(){
                  return new Promise((resolve, reject) => {
@@ -192,120 +194,121 @@
                        this.isLoading = true
                      })
                  })
-               },
-               match(){
-                      return new Promise((resolve, reject) => {
-                          this.$refs.columns.click()
-                          .then(data => {
-                              this.isLoading = true
-                              resolve(true)
-                          }).catch(error => {
-                            console.log(err)
-                              reject(error)
-                            this.isLoading = true
-                          })
-                      })
-                    },
-            submit() {
-                const _this = this;
-                //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
-                this.form.csv = this.buildMappedCsv();
-                if (this.url) {
-                    axios.post(this.url, this.form).then(response => {
-                        _this.callback(response);
-                    }).catch(response => {
-                        _this.catch(response);
-                    }).finally(response => {
-                        _this.finally(response);
-                    });
-                } else {
-                    _this.callback(this.form.csv);
-                }
-            },
-            chekthis(){
-              this.$refs.wizard.changeTab(1,2)
-              const _this = this;
-              console.log('The number of items in my CSV is ' + this.form.csv.length);
-
-              axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
-              .then((response) => {
-                  this.data = response
-                  console.log("Data sent to http://127.0.0.1:8000/api/csv ")
-                  this.data = this.form.csv
-                  console.log(this.data)
-                  //console.log(response.data)
-                  console.log("This was successfully done")
+          },
+          handleErrorMessage: function(errorMsg){
+                this.errorMsg = errorMsg
+          },
+          match(){
+            return new Promise((resolve, reject) => {
+                this.$refs.columns.click()
+                .then(data => {
+                    this.isLoading = true
+                    resolve(true)
+                }).catch(error => {
+                  console.log(err)
+                  reject(error)
+                  this.isLoading = true
+                  })
                 })
-                .catch(err => { console.log(err)});
-            },
-            buildMappedCsv() {
-                const _this = this;
+          },
+          submit() {
+            const _this = this;
+            this.form.csv = this.buildMappedCsv();
+                  if (this.url) {
+                      axios.post(this.url, this.form).then(response => {
+                          _this.callback(response);
+                      }).catch(response => {
+                          _this.catch(response);
+                      }).finally(response => {
+                          _this.finally(response);
+                      });
+                  } else {
+                      _this.callback(this.form.csv);
+                  }
+          },
+          chekthis(){
+            this.$refs.wizard.changeTab(1,2)
+            const _this = this;
+            console.log('The number of items in my CSV is ' + this.form.csv.length);
 
-                let csv = this.hasHeaders ? _.drop(this.csv) : this.csv;
+            axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
+            .then((response) => {
+                this.data = response
+                console.log("Data sent to http://127.0.0.1:8000/api/csv ")
+                this.data = this.form.csv
+                console.log(this.data)
+                //console.log(response.data)
+                console.log("This was successfully done")
+            }).catch(err => { console.log(err)});
+          },
+          buildMappedCsv() {
+            const _this = this;
 
-                return _.map(csv, (row) => {
-                    let newRow = {};
+            let csv = this.hasHeaders ? _.drop(this.csv) : this.csv;
 
-                    _.forEach(_this.map, (column, field) => {
-                        _.set(newRow, field, _.get(row, column));
-                    });
+            return _.map(csv, (row) => {
+            let newRow = {};
 
-                    return newRow;
-                });
-            },
-            validFileMimeType() {
-                let file = this.$refs.csv.files[0];
-                const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
+            _.forEach(_this.map, (column, field) => {
+            _.set(newRow, field, _.get(row, column));
+            });
 
-                if (file) {
-                    this.fileSelected = true;
-                    this.isValidFileMimeType = this.validation ? this.validateMimeType(mimeType) : true;
-                } else {
-                    this.isValidFileMimeType = !this.validation;
-                    this.fileSelected = false;
+            return newRow;
+            });
+          },
+          validFileMimeType() {
+            let file = this.$refs.csv.files[0];
+            const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
+
+            if (file) {
+               this.fileSelected = true;
+               this.isValidFileMimeType = this.validation ? this.validateMimeType(mimeType) : true;
+            }
+            else{
+                this.isValidFileMimeType = !this.validation;
+                this.fileSelected = false;
+            }
+          },
+          validateMimeType(type) {
+            return this.fileMimeTypes.indexOf(type) > -1;
+          },
+          load() {
+            this.$refs.wizard.changeTab(0,1)
+            const _this = this;
+            this.readFile((output) => {
+                _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+
+                for(let i = 0; i < _this.sample[0].length; i++){
+                   this.options.push(_this.sample[0][i]);
                 }
-            },
-            validateMimeType(type) {
-                return this.fileMimeTypes.indexOf(type) > -1;
-            },
-            load() {
-                this.$refs.wizard.changeTab(0,1)
-                const _this = this;
-                this.readFile((output) => {
-                    _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
-                    _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+            });
+          },
+          readFile(callback) {
+            let file = this.$refs.csv.files[0];
 
-                    for(let i = 0; i < _this.sample[0].length; i++){
-                      //console.log(_this.sample[0][i]);
-                      this.options.push(_this.sample[0][i]);
-                    }
-                });
-            },
-            readFile(callback) {
-                let file = this.$refs.csv.files[0];
-
-                if (file) {
-                    let reader = new FileReader();
-                    reader.readAsText(file, "UTF-8");
-                    reader.onload = function (evt) {
-                        callback(evt.target.result);
-                    };
-                    reader.onerror = function () {
-                    };
-                }
-            },
-            toggleHasHeaders() {
-                this.hasHeaders = !this.hasHeaders;
-            },
-            makeId(id) {
-                return `${id}${this._uid}`;
-            },
-            handleValueChange(e) {
-              const option = e.target.value
-              this.isUsed = {
-                ...this.isUsed,[option]: true
+            if (file) {
+               let reader = new FileReader();
+               reader.readAsText(file, "UTF-8");
+               reader.onload = function (evt) {
+                 callback(evt.target.result);
+               };
+              reader.onerror = function () {
               };
             }
+          },
+          toggleHasHeaders() {
+                this.hasHeaders = !this.hasHeaders;
+          },
+          makeId(id) {
+              return `${id}${this._uid}`;
+          },
+          handleValueChange(e) {
+            const option = e.target.value
+            this.isUsed = {
+            ...this.isUsed,[option]: true
+            };
+          }
         },
         watch: {
             map: {

@@ -61363,6 +61363,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -61444,12 +61448,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         }
     },
-
     data: function data() {
         return {
             form: {
                 csv: null
             },
+            errorMsg: null,
             fieldsToMap: [],
             map: {},
             hasHeaders: true,
@@ -61463,7 +61467,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
         };
     },
-
     created: function created() {
 
         if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isArray(this.mapFields)) {
@@ -61483,7 +61486,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
 
-
     methods: {
         click: function click() {
             var _this2 = this;
@@ -61498,6 +61500,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     _this2.isLoading = true;
                 });
             });
+        },
+
+        handleErrorMessage: function handleErrorMessage(errorMsg) {
+            this.errorMsg = errorMsg;
         },
         match: function match() {
             var _this3 = this;
@@ -61515,7 +61521,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         },
         submit: function submit() {
             var _this = this;
-            //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
             this.form.csv = this.buildMappedCsv();
             if (this.url) {
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post(this.url, this.form).then(function (response) {
@@ -61587,7 +61592,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
 
                 for (var i = 0; i < _this.sample[0].length; i++) {
-                    //console.log(_this.sample[0][i]);
                     _this5.options.push(_this.sample[0][i]);
                 }
             });
@@ -62211,7 +62215,10 @@ var render = function() {
         {
           ref: "wizard",
           attrs: { color: "#1CD171", "error-color": "#1CD171" },
-          on: { "on-complete": _vm.onComplete }
+          on: {
+            "on-complete": _vm.onComplete,
+            "on-error": _vm.handleErrorMessage
+          }
         },
         [
           _c("h2", { attrs: { slot: "title" }, slot: "title" }, [
@@ -62318,6 +62325,14 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "vue-csv-uploader-part-two" }, [
+                _vm.errorMsg
+                  ? _c("div", [
+                      _c("span", { staticClass: "error" }, [
+                        _vm._v(_vm._s(_vm.errorMsg))
+                      ])
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _vm.sample
                   ? _c("div", { staticClass: "vue-csv-mapping" }, [
                       _c(
@@ -62445,7 +62460,7 @@ var render = function() {
             _c("div", { staticClass: "mt-2" }, [
               _c("div", { staticClass: "panel-body" }, [
                 _vm._v(
-                  "\n                " + _vm._s(_vm.data) + "\n              "
+                  "\n                " + _vm._s(_vm.data) + "\n\n              "
                 )
               ])
             ])
