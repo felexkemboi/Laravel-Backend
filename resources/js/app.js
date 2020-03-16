@@ -6,6 +6,8 @@
 
 require('./bootstrap');
 require('./VueCsvImport');
+import VueRouter from 'vue-router'
+
 
 
 window.Vue = require('vue');
@@ -40,8 +42,7 @@ import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 import  'vue-themify-icons';
 
 Vue.use(VueFormWizard)
-
-
+Vue.use(VueRouter)
 Vue.use(VueCsvImportPlugin);
 
 const app = new Vue({

@@ -3,9 +3,8 @@
         <div class="form">
           <form-wizard @on-complete="onComplete"  color="#8191BD"  error-color="#0080ff" ref="wizard" @on-error="handleErrorMessage">
 
-            <!--This is the beginning of the first  tab,
-                before it changes to the next tab,it calls a function to upload the file, upload_file
-            -->
+
+            <!--This is the first  tab, before it changes to the next tab,it calls a function to upload the file, upload_file  -->
             <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
               <div v-if="errorMsg">
                 <span class="error">{{errorMsg}}</span>
@@ -28,7 +27,9 @@
                   </div>
               </div>
             </tab-content>
-            <tab-content title="Match Columns" icon="ti-settings" :before-change="match">
+
+            <!--This is the second tab before it changes to the next tab,it calls a function to match the columns match_columns -->
+            <tab-content title="Match Columns" icon="ti-settings" :before-change="match_columns">
               <div class="vue-csv-uploader-part-two">
                 <div v-if="errorMsg">
                   <span class="error">{{errorMsg}}</span>
@@ -61,6 +62,8 @@
                   </div>
               </div>
             </tab-content>
+
+            <!--This is the third and final tab -->
             <tab-content title="Finish" icon="ti-check">
               <div v-if="errorMsg">
                 <span class="error">{{errorMsg}}</span>
@@ -68,9 +71,9 @@
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
                     {{ Home }}
-                </button>
+                </button>&#160;&#160;&#160;
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
-                      {{ Home }}
+                    {{ Home }}
                   </button>
               </div>
                 <div class="mt-2">
@@ -215,7 +218,7 @@
               }
             })
           },
-          match(){
+          match_columns(){
             return new Promise((resolve, reject) => {
                 if(this.$refs.columns.click()){
                   this.$refs.columns.click()
