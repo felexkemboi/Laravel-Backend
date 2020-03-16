@@ -6,13 +6,11 @@
               color="#8191BD"
               error-color="#0080ff"
               @on-error="handleErrorMessage"
-              @on-complete="onComplete" >
+              @on-complete="onComplete"
+              :hide-buttons="true">
 
             <!--This is the first  tab, before it changes to the next tab,it calls a function to upload the file, upload_file  -->
             <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
-              <div v-if="errorMsg">
-                <span class="error">{{errorMsg}}</span>
-              </div>
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -23,8 +21,8 @@
                       </slot>
                   </div>
                   <div class="form-group">
-                      <slot name="next" :load="load" >
-                          <button   style="display:none;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load"> <!--visibility:hidden;-->
+                      <slot name="next" :load="load">
+                          <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load"> <!-- style="display:none;" visibility:hidden;   ref="load_file" -->
                               {{ loadBtnText }}
                           </button>
                       </slot>
@@ -38,8 +36,8 @@
                 <div v-if="errorMsg">
                   <span class="error">{{errorMsg}}</span>
                 </div>
-                  <div class="vue-csv-mapping" v-if="sample">
-                      <table :class="tableClass">
+                <div class="vue-csv-mapping" v-if="sample">
+                    <table :class="tableClass">
                           <slot name="thead">
                               <thead>
                               <tr>
@@ -58,12 +56,11 @@
                               </td>
                           </tr>
                           </tbody>
-                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="laststep"  ref="columns" style="display:none;"><!--visibility:hidden;-->
+                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass"  @click.prevent="laststep"><!-- style="display:none;"visibility:hidden;   ref="columns" -->
                               {{ LastStep }}
                           </button>
                       </table>
-
-                  </div>
+                </div>
               </div>
             </tab-content>
 
@@ -73,11 +70,12 @@
                 <span class="error">{{errorMsg}}</span>
               </div>
               <div class='row'>
-                <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
+                <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     {{ upload_Again }}
-                </button>&#160;&#160;&#160;
+                </button>
+                &#160;&#160;&#160;
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
-                    {{ Home }}
+                    {{ back_Home }}
                   </button>
               </div>
                 <div class="mt-2">
@@ -85,9 +83,9 @@
                     <!--{{ data }} -->
 
                   </div>
-
                 </div>
             </tab-content>
+
           </form-wizard>
         </div>
     </div>
@@ -103,6 +101,14 @@
     export default {
         props: {
             value: Array,
+            title: {
+            type: String,
+            default: 'yy'
+          },
+            subtitle: {
+              type: String,
+              default: ''
+            },
             url: {
                 type: String
             },
@@ -132,7 +138,11 @@
             },
             loadBtnText: {
                 type: String,
-                default: "Next"
+                default: "Upload File"
+            },
+            LastStep: {
+                type: String,
+                default: "Match Columns"
             },
             chekiBtnText: {
                 type: String,
@@ -141,6 +151,10 @@
             upload_Again: {
                 type: String,
                 default: "Upload Again"
+            },
+            back_Home: {
+                type: String,
+                default: "Back Home"
             },
             submitBtnText: {
                 type: String,
@@ -214,8 +228,8 @@
           },
           upload_file(){
             return new Promise((resolve, reject) => {
-              if(this.$refs.upload.click()){
-                this.$refs.upload.click()
+              if(this.$refs.load_file.click()){
+                this.$refs.load_file.click()
                 resolve(true)
               }else{
                 reject(false)
@@ -335,6 +349,9 @@
           backhome() {
               console.log("Home button now")
           },
+          redirect_to_upload() { // this method is called on button click
+            console.log("Upload Again")
+          }
         },
         watch: {
             map: {
