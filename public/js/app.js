@@ -61388,6 +61388,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -61438,9 +61442,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             type: String,
             default: "Submit"
         },
-        Home: {
+        upload_Again: {
             type: String,
-            default: "Home"
+            default: "Upload Again"
         },
         submitBtnText: {
             type: String,
@@ -62241,8 +62245,8 @@ var render = function() {
           ref: "wizard",
           attrs: { color: "#8191BD", "error-color": "#0080ff" },
           on: {
-            "on-complete": _vm.onComplete,
-            "on-error": _vm.handleErrorMessage
+            "on-error": _vm.handleErrorMessage,
+            "on-complete": _vm.onComplete
           }
         },
         [
@@ -62503,7 +62507,9 @@ var render = function() {
                 },
                 [
                   _vm._v(
-                    "\n                " + _vm._s(_vm.Home) + "\n            "
+                    "\n                " +
+                      _vm._s(_vm.upload_Again) +
+                      "\n            "
                   )
                 ]
               ),

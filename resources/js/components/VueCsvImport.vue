@@ -1,8 +1,12 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete"  color="#8191BD"  error-color="#0080ff" ref="wizard" @on-error="handleErrorMessage">
-
+          <form-wizard
+              ref="wizard"
+              color="#8191BD"
+              error-color="#0080ff"
+              @on-error="handleErrorMessage"
+              @on-complete="onComplete" >
 
             <!--This is the first  tab, before it changes to the next tab,it calls a function to upload the file, upload_file  -->
             <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
@@ -70,7 +74,7 @@
               </div>
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
-                    {{ Home }}
+                    {{ upload_Again }}
                 </button>&#160;&#160;&#160;
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
                     {{ Home }}
@@ -134,9 +138,9 @@
                 type: String,
                 default: "Submit"
             },
-            Home: {
+            upload_Again: {
                 type: String,
-                default: "Home"
+                default: "Upload Again"
             },
             submitBtnText: {
                 type: String,
