@@ -1,9 +1,15 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete" color="#800000"  ref="wizard">
-            <h2 slot="title">Upload File</h2>
-            <tab-content title="Upload File" icon="ti-user"  :before-change="click">
+          <form-wizard @on-complete="onComplete"  color="#8191BD"  error-color="#0080ff" ref="wizard" @on-error="handleErrorMessage">
+
+            <!--This is the beginning of the first  tab,
+                before it changes to the next tab,it calls a function to upload the file, upload_file
+            -->
+            <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
+              <div v-if="errorMsg">
+                <span class="error">{{errorMsg}}</span>
+              </div>
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -15,7 +21,7 @@
                   </div>
                   <div class="form-group">
                       <slot name="next" :load="load" >
-                          <button   style="display:none;visibility:hidden;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load">
+                          <button   style="display:none;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load"> <!--visibility:hidden;-->
                               {{ loadBtnText }}
                           </button>
                       </slot>
@@ -24,6 +30,9 @@
             </tab-content>
             <tab-content title="Match Columns" icon="ti-settings" :before-change="match">
               <div class="vue-csv-uploader-part-two">
+                <div v-if="errorMsg">
+                  <span class="error">{{errorMsg}}</span>
+                </div>
                   <div class="vue-csv-mapping" v-if="sample">
                       <table :class="tableClass">
                           <slot name="thead">
@@ -44,25 +53,30 @@
                               </td>
                           </tr>
                           </tbody>
-                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis" ref="columns" style="display:none;visibility:hidden;">
-                              {{ chekiBtnText }}
+                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="laststep"  ref="columns" style="display:none;"><!--visibility:hidden;-->
+                              {{ LastStep }}
                           </button>
-
                       </table>
-                      <!--  <div class="form-group" v-if="url">
-                          <slot name="submit" :submit="submit">
-                              <input type="submit" :class="buttonClass" @click.prevent="submit" :value="submitBtnText" style="display:none;visibility:hidden;">
-                          </slot>
-                      </div> -->
+
                   </div>
               </div>
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
-              Yuhuuu! This seems pretty damn simple
-              <v-divider class="mx-4" :inset="inset" vertical></v-divider>
+              <div v-if="errorMsg">
+                <span class="error">{{errorMsg}}</span>
+              </div>
+              <div class='row'>
+                <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
+                    {{ Home }}
+                </button>
+                <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
+                      {{ Home }}
+                  </button>
+              </div>
                 <div class="mt-2">
                   <div class="panel-body">
-                    {{ data }}
+                    <!--{{ data }} -->
+
                   </div>
 
                 </div>
@@ -117,6 +131,10 @@
                 type: String,
                 default: "Submit"
             },
+            Home: {
+                type: String,
+                default: "Home"
+            },
             submitBtnText: {
                 type: String,
                 default: "Submit"
@@ -148,11 +166,11 @@
                 }
             }
         },
-
         data: () => ({
             form: {
                 csv: null,
             },
+            errorMsg: null,
             fieldsToMap: [],
             map: {},
             hasHeaders: true,
@@ -165,7 +183,6 @@
             isUsed: {}
 
         }),
-
         created() {
 
             if (_.isArray(this.mapFields)) {
@@ -184,134 +201,133 @@
                 });
             }
         },
-
         methods: {
-          click(){
-                 return new Promise((resolve, reject) => {
-                     this.$refs.upload.click()
-                     .then(data => {
-                         this.isLoading = true
-                         resolve(true)
-                     }).catch(error => {
-                       console.log(err)
-                         reject(error)
-                       this.isLoading = true
-                     })
-                 })
-               },
-               match(){
-                      return new Promise((resolve, reject) => {
-                          this.$refs.columns.click()
-                          .then(data => {
-                              this.isLoading = true
-                              resolve(true)
-                          }).catch(error => {
-                            console.log(err)
-                              reject(error)
-                            this.isLoading = true
-                          })
-                      })
-                    },
-            submit() {
-                const _this = this;
-                //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
-                this.form.csv = this.buildMappedCsv();
-                if (this.url) {
-                    axios.post(this.url, this.form).then(response => {
-                        _this.callback(response);
-                    }).catch(response => {
-                        _this.catch(response);
-                    }).finally(response => {
-                        _this.finally(response);
-                    });
-                } else {
-                    _this.callback(this.form.csv);
+          handleErrorMessage(errorMsg){
+                this.errorMsg = errorMsg
+          },
+          upload_file(){
+            return new Promise((resolve, reject) => {
+              if(this.$refs.upload.click()){
+                this.$refs.upload.click()
+                resolve(true)
+              }else{
+                reject(false)
+              }
+            })
+          },
+          match(){
+            return new Promise((resolve, reject) => {
+                if(this.$refs.columns.click()){
+                  this.$refs.columns.click()
+                  //console.log("Just matched!")
+                  resolve(true)
+                }else{
+                  reject(false)
+                  //console.log("not matched!")
                 }
-            },
-            chekthis(){
-              this.$refs.wizard.changeTab(1,2)
-              const _this = this;
-              console.log('The number of items in my CSV is ' + this.form.csv.length);
+              })
+          },
+          submit() {
+            const _this = this;
+            this.form.csv = this.buildMappedCsv();
+                  if (this.url) {
+                      axios.post(this.url, this.form).then(response => {
+                          _this.callback(response);
+                      }).catch(response => {
+                          _this.catch(response);
+                      }).finally(response => {
+                          _this.finally(response);
+                      });
+                  } else {
+                      _this.callback(this.form.csv);
+                  }
+          },
+          laststep(){
+            this.$refs.wizard.changeTab(1,2)
+            const _this = this;
+            console.log('The number of items in my CSV is ' + this.form.csv.length);
 
-              axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
-              .then((response) => {
-                  this.data = response
-                  console.log("Data sent to http://127.0.0.1:8000/api/csv ")
-                  this.data = this.form.csv
-                  console.log(this.data)
-                  //console.log(response.data)
-                  console.log("This was successfully done")
-                })
-                .catch(err => { console.log(err)});
-            },
-            buildMappedCsv() {
-                const _this = this;
+            axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
+            .then((response) => {
+                this.data = response
+                console.log("Data sent to http://127.0.0.1:8000/api/csv ")
+                this.data = this.form.csv
+                console.log(this.data)
+                //console.log(response.data)
+                console.log("This was successfully done")
+            }).catch(err => { console.log(err)});
+          },
+          load() {
+            this.$refs.wizard.changeTab(0,1)
+            const _this = this;
+            this.readFile((output) => {
+                _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
 
-                let csv = this.hasHeaders ? _.drop(this.csv) : this.csv;
-
-                return _.map(csv, (row) => {
-                    let newRow = {};
-
-                    _.forEach(_this.map, (column, field) => {
-                        _.set(newRow, field, _.get(row, column));
-                    });
-
-                    return newRow;
-                });
-            },
-            validFileMimeType() {
-                let file = this.$refs.csv.files[0];
-                const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
-
-                if (file) {
-                    this.fileSelected = true;
-                    this.isValidFileMimeType = this.validation ? this.validateMimeType(mimeType) : true;
-                } else {
-                    this.isValidFileMimeType = !this.validation;
-                    this.fileSelected = false;
+                for(let i = 0; i < _this.sample[0].length; i++){
+                   this.options.push(_this.sample[0][i]);
                 }
-            },
-            validateMimeType(type) {
-                return this.fileMimeTypes.indexOf(type) > -1;
-            },
-            load() {
-                this.$refs.wizard.changeTab(0,1)
-                const _this = this;
-                this.readFile((output) => {
-                    _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
-                    _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+            });
+          },
+          buildMappedCsv() {
+            const _this = this;
 
-                    for(let i = 0; i < _this.sample[0].length; i++){
-                      //console.log(_this.sample[0][i]);
-                      this.options.push(_this.sample[0][i]);
-                    }
-                });
-            },
-            readFile(callback) {
-                let file = this.$refs.csv.files[0];
+            let csv = this.hasHeaders ? _.drop(this.csv) : this.csv;
 
-                if (file) {
-                    let reader = new FileReader();
-                    reader.readAsText(file, "UTF-8");
-                    reader.onload = function (evt) {
-                        callback(evt.target.result);
-                    };
-                    reader.onerror = function () {
-                    };
-                }
-            },
-            toggleHasHeaders() {
-                this.hasHeaders = !this.hasHeaders;
-            },
-            makeId(id) {
-                return `${id}${this._uid}`;
-            },
-            handleValueChange(e) {
-              const option = e.target.value
-              this.isUsed = {
-                ...this.isUsed,[option]: true
+            return _.map(csv, (row) => {
+            let newRow = {};
+
+            _.forEach(_this.map, (column, field) => {
+            _.set(newRow, field, _.get(row, column));
+            });
+
+            return newRow;
+            });
+          },
+          validFileMimeType() {
+            let file = this.$refs.csv.files[0];
+            const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
+
+            if (file) {
+               this.fileSelected = true;
+               this.isValidFileMimeType = this.validation ? this.validateMimeType(mimeType) : true;
+            }
+            else{
+                this.isValidFileMimeType = !this.validation;
+                this.fileSelected = false;
+            }
+          },
+          validateMimeType(type) {
+            return this.fileMimeTypes.indexOf(type) > -1;
+          },
+          readFile(callback) {
+            let file = this.$refs.csv.files[0];
+
+            if (file) {
+               let reader = new FileReader();
+               reader.readAsText(file, "UTF-8");
+               reader.onload = function (evt) {
+                 callback(evt.target.result);
+               };
+              reader.onerror = function () {
               };
             }
+          },
+          toggleHasHeaders() {
+                this.hasHeaders = !this.hasHeaders;
+          },
+          makeId(id) {
+              return `${id}${this._uid}`;
+          },
+          handleValueChange(e) {
+            const option = e.target.value
+            this.isUsed = {
+            ...this.isUsed,[option]: true
+            };
+          },
+          backhome() {
+              console.log("Home button now")
+          },
         },
         watch: {
             map: {

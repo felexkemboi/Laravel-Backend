@@ -61369,6 +61369,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -61419,6 +61433,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             type: String,
             default: "Submit"
         },
+        Home: {
+            type: String,
+            default: "Home"
+        },
         submitBtnText: {
             type: String,
             default: "Submit"
@@ -61450,12 +61468,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         }
     },
-
     data: function data() {
         return {
             form: {
                 csv: null
             },
+            errorMsg: null,
             fieldsToMap: [],
             map: {},
             hasHeaders: true,
@@ -61469,7 +61487,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
         };
     },
-
     created: function created() {
 
         if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isArray(this.mapFields)) {
@@ -61489,39 +61506,38 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
 
-
     methods: {
-        click: function click() {
+        handleErrorMessage: function handleErrorMessage(errorMsg) {
+            this.errorMsg = errorMsg;
+        },
+        upload_file: function upload_file() {
             var _this2 = this;
 
             return new Promise(function (resolve, reject) {
-                _this2.$refs.upload.click().then(function (data) {
-                    _this2.isLoading = true;
+                if (_this2.$refs.upload.click()) {
+                    _this2.$refs.upload.click();
                     resolve(true);
-                }).catch(function (error) {
-                    console.log(err);
-                    reject(error);
-                    _this2.isLoading = true;
-                });
+                } else {
+                    reject(false);
+                }
             });
         },
         match: function match() {
             var _this3 = this;
 
             return new Promise(function (resolve, reject) {
-                _this3.$refs.columns.click().then(function (data) {
-                    _this3.isLoading = true;
+                if (_this3.$refs.columns.click()) {
+                    _this3.$refs.columns.click();
+                    //console.log("Just matched!")
                     resolve(true);
-                }).catch(function (error) {
-                    console.log(err);
-                    reject(error);
-                    _this3.isLoading = true;
-                });
+                } else {
+                    reject(false);
+                    //console.log("not matched!")
+                }
             });
         },
         submit: function submit() {
             var _this = this;
-            //this.url = "http://127.0.0.1:5000/vue" // add the url to recir
             this.form.csv = this.buildMappedCsv();
             if (this.url) {
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post(this.url, this.form).then(function (response) {
@@ -61535,7 +61551,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this.callback(this.form.csv);
             }
         },
-        chekthis: function chekthis() {
+        laststep: function laststep() {
             var _this4 = this;
 
             this.$refs.wizard.changeTab(1, 2);
@@ -61551,6 +61567,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 console.log("This was successfully done");
             }).catch(function (err) {
                 console.log(err);
+            });
+        },
+        load: function load() {
+            var _this5 = this;
+
+            this.$refs.wizard.changeTab(0, 1);
+            var _this = this;
+            this.readFile(function (output) {
+                _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
+
+                for (var i = 0; i < _this.sample[0].length; i++) {
+                    _this5.options.push(_this.sample[0][i]);
+                }
             });
         },
         buildMappedCsv: function buildMappedCsv() {
@@ -61583,21 +61613,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         validateMimeType: function validateMimeType(type) {
             return this.fileMimeTypes.indexOf(type) > -1;
         },
-        load: function load() {
-            var _this5 = this;
-
-            this.$refs.wizard.changeTab(0, 1);
-            var _this = this;
-            this.readFile(function (output) {
-                _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
-                _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
-
-                for (var i = 0; i < _this.sample[0].length; i++) {
-                    //console.log(_this.sample[0][i]);
-                    _this5.options.push(_this.sample[0][i]);
-                }
-            });
-        },
         readFile: function readFile(callback) {
             var file = this.$refs.csv.files[0];
 
@@ -61619,6 +61634,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         handleValueChange: function handleValueChange(e) {
             var option = e.target.value;
             this.isUsed = _extends({}, this.isUsed, _defineProperty({}, option, true));
+        },
+        backhome: function backhome() {
+            console.log("Home button now");
         }
     },
     watch: {
@@ -62216,24 +62234,31 @@ var render = function() {
         "form-wizard",
         {
           ref: "wizard",
-          attrs: { color: "#800000" },
-          on: { "on-complete": _vm.onComplete }
+          attrs: { color: "#8191BD", "error-color": "#0080ff" },
+          on: {
+            "on-complete": _vm.onComplete,
+            "on-error": _vm.handleErrorMessage
+          }
         },
         [
-          _c("h2", { attrs: { slot: "title" }, slot: "title" }, [
-            _vm._v("Upload File")
-          ]),
-          _vm._v(" "),
           _c(
             "tab-content",
             {
               attrs: {
                 title: "Upload File",
-                icon: "ti-user",
-                "before-change": _vm.click
+                icon: "ti-file",
+                "before-change": _vm.upload_file
               }
             },
             [
+              _vm.errorMsg
+                ? _c("div", [
+                    _c("span", { staticClass: "error" }, [
+                      _vm._v(_vm._s(_vm.errorMsg))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("div", { staticClass: "vue-csv-uploader-part-one" }, [
                 _c(
                   "div",
@@ -62280,10 +62305,7 @@ var render = function() {
                           {
                             ref: "upload",
                             class: _vm.buttonClass,
-                            staticStyle: {
-                              display: "none",
-                              visibility: "hidden"
-                            },
+                            staticStyle: { display: "none" },
                             attrs: {
                               type: "submit",
                               disabled: _vm.disabledNextButton
@@ -62324,6 +62346,14 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "vue-csv-uploader-part-two" }, [
+                _vm.errorMsg
+                  ? _c("div", [
+                      _c("span", { staticClass: "error" }, [
+                        _vm._v(_vm._s(_vm.errorMsg))
+                      ])
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _vm.sample
                   ? _c("div", { staticClass: "vue-csv-mapping" }, [
                       _c(
@@ -62415,10 +62445,7 @@ var render = function() {
                             {
                               ref: "columns",
                               class: _vm.buttonClass,
-                              staticStyle: {
-                                display: "none",
-                                visibility: "hidden"
-                              },
+                              staticStyle: { display: "none" },
                               attrs: {
                                 type: "submit",
                                 disabled: _vm.disabledNextButton
@@ -62426,14 +62453,14 @@ var render = function() {
                               on: {
                                 click: function($event) {
                                   $event.preventDefault()
-                                  return _vm.chekthis($event)
+                                  return _vm.laststep($event)
                                 }
                               }
                             },
                             [
                               _vm._v(
                                 "\n                          " +
-                                  _vm._s(_vm.chekiBtnText) +
+                                  _vm._s(_vm.LastStep) +
                                   "\n                      "
                               )
                             ]
@@ -62447,28 +62474,61 @@ var render = function() {
             ]
           ),
           _vm._v(" "),
-          _c(
-            "tab-content",
-            { attrs: { title: "Finish", icon: "ti-check" } },
-            [
-              _vm._v(
-                "\n          Yuhuuu! This seems pretty damn simple\n          "
-              ),
-              _c("v-divider", {
-                staticClass: "mx-4",
-                attrs: { inset: _vm.inset, vertical: "" }
-              }),
-              _vm._v(" "),
-              _c("div", { staticClass: "mt-2" }, [
-                _c("div", { staticClass: "panel-body" }, [
-                  _vm._v(
-                    "\n                " + _vm._s(_vm.data) + "\n              "
-                  )
+          _c("tab-content", { attrs: { title: "Finish", icon: "ti-check" } }, [
+            _vm.errorMsg
+              ? _c("div", [
+                  _c("span", { staticClass: "error" }, [
+                    _vm._v(_vm._s(_vm.errorMsg))
+                  ])
                 ])
-              ])
-            ],
-            1
-          )
+              : _vm._e(),
+            _vm._v(" "),
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "button",
+                {
+                  class: _vm.buttonClass,
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.backhome($event)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                " + _vm._s(_vm.Home) + "\n            "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  class: _vm.buttonClass,
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.backhome($event)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                  " +
+                      _vm._s(_vm.Home) +
+                      "\n              "
+                  )
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "mt-2" }, [
+              _c("div", { staticClass: "panel-body" })
+            ])
+          ])
         ],
         1
       )
@@ -62611,6 +62671,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "app",
@@ -62625,7 +62687,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         axios.get("http://127.0.0.1:8000/api/dbnames").then(function (res) {
             _this.maps = res.data;
-            //console.log(this.maps)
         }).catch(function (err) {
             console.log(err);
         });
@@ -62647,10 +62708,9 @@ var render = function() {
       _c("section", { staticClass: "py-5" }, [
         _vm._m(1),
         _vm._v(" "),
-        _c("div", { staticClass: "row mt-5" }, [
+        _c("div", { staticClass: "row" }, [
           _c(
             "div",
-            { staticClass: "col-8 offset-2" },
             [
               _c("h4", { staticClass: "mb-4" }, [
                 _vm._v("Upload the CSV File below")
