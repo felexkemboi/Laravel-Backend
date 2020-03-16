@@ -1,9 +1,15 @@
 
 <template>
         <div class="form">
-          <form-wizard @on-complete="onComplete"  color="#1CD171" error-color="#1CD171" ref="wizard" @on-error="handleErrorMessage"> <!--color="#800000"-->
-            <h2 slot="title">Upload File</h2>
-            <tab-content title="Upload File" icon="ti-file"  :before-change="click">
+          <form-wizard @on-complete="onComplete"  color="#8191BD"  error-color="#0080ff" ref="wizard" @on-error="handleErrorMessage">
+
+            <!--This is the beginning of the first  tab,
+                before it changes to the next tab,it calls a function to upload the file, upload_file
+            -->
+            <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
+              <div v-if="errorMsg">
+                <span class="error">{{errorMsg}}</span>
+              </div>
               <div class="vue-csv-uploader-part-one">
                   <div class="form-group csv-import-file">
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
@@ -15,7 +21,7 @@
                   </div>
                   <div class="form-group">
                       <slot name="next" :load="load" >
-                          <button   style="display:none;visibility:hidden;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load">
+                          <button   style="display:none;" type="submit" :disabled="disabledNextButton" ref="upload" :class="buttonClass" @click.prevent="load"> <!--visibility:hidden;-->
                               {{ loadBtnText }}
                           </button>
                       </slot>
@@ -47,8 +53,8 @@
                               </td>
                           </tr>
                           </tbody>
-                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="chekthis" ref="columns" style="display:none;visibility:hidden;">
-                              {{ chekiBtnText }}
+                        <button type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="laststep"  ref="columns" style="display:none;"><!--visibility:hidden;-->
+                              {{ LastStep }}
                           </button>
                       </table>
 
@@ -56,10 +62,20 @@
               </div>
             </tab-content>
             <tab-content title="Finish" icon="ti-check">
-
+              <div v-if="errorMsg">
+                <span class="error">{{errorMsg}}</span>
+              </div>
+              <div class='row'>
+                <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
+                    {{ Home }}
+                </button>
+                <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
+                      {{ Home }}
+                  </button>
+              </div>
                 <div class="mt-2">
                   <div class="panel-body">
-                    {{ data }}
+                    <!--{{ data }} -->
 
                   </div>
 
@@ -114,6 +130,10 @@
             chekiBtnText: {
                 type: String,
                 default: "Submit"
+            },
+            Home: {
+                type: String,
+                default: "Home"
             },
             submitBtnText: {
                 type: String,
@@ -182,34 +202,30 @@
             }
         },
         methods: {
-          click(){
-                 return new Promise((resolve, reject) => {
-                     this.$refs.upload.click()
-                     .then(data => {
-                         this.isLoading = true
-                         resolve(true)
-                     }).catch(error => {
-                       console.log(err)
-                         reject(error)
-                       this.isLoading = true
-                     })
-                 })
-          },
-          handleErrorMessage: function(errorMsg){
+          handleErrorMessage(errorMsg){
                 this.errorMsg = errorMsg
+          },
+          upload_file(){
+            return new Promise((resolve, reject) => {
+              if(this.$refs.upload.click()){
+                this.$refs.upload.click()
+                resolve(true)
+              }else{
+                reject(false)
+              }
+            })
           },
           match(){
             return new Promise((resolve, reject) => {
-                this.$refs.columns.click()
-                .then(data => {
-                    this.isLoading = true
-                    resolve(true)
-                }).catch(error => {
-                  console.log(err)
-                  reject(error)
-                  this.isLoading = true
-                  })
-                })
+                if(this.$refs.columns.click()){
+                  this.$refs.columns.click()
+                  //console.log("Just matched!")
+                  resolve(true)
+                }else{
+                  reject(false)
+                  //console.log("not matched!")
+                }
+              })
           },
           submit() {
             const _this = this;
@@ -226,7 +242,7 @@
                       _this.callback(this.form.csv);
                   }
           },
-          chekthis(){
+          laststep(){
             this.$refs.wizard.changeTab(1,2)
             const _this = this;
             console.log('The number of items in my CSV is ' + this.form.csv.length);
@@ -240,6 +256,18 @@
                 //console.log(response.data)
                 console.log("This was successfully done")
             }).catch(err => { console.log(err)});
+          },
+          load() {
+            this.$refs.wizard.changeTab(0,1)
+            const _this = this;
+            this.readFile((output) => {
+                _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
+
+                for(let i = 0; i < _this.sample[0].length; i++){
+                   this.options.push(_this.sample[0][i]);
+                }
+            });
           },
           buildMappedCsv() {
             const _this = this;
@@ -272,18 +300,6 @@
           validateMimeType(type) {
             return this.fileMimeTypes.indexOf(type) > -1;
           },
-          load() {
-            this.$refs.wizard.changeTab(0,1)
-            const _this = this;
-            this.readFile((output) => {
-                _this.sample = _.get(Papa.parse(output, { preview: 2, skipEmptyLines: true }), "data");
-                _this.csv = _.get(Papa.parse(output, { skipEmptyLines: true }), "data");
-
-                for(let i = 0; i < _this.sample[0].length; i++){
-                   this.options.push(_this.sample[0][i]);
-                }
-            });
-          },
           readFile(callback) {
             let file = this.$refs.csv.files[0];
 
@@ -308,7 +324,10 @@
             this.isUsed = {
             ...this.isUsed,[option]: true
             };
-          }
+          },
+          backhome() {
+              console.log("Home button now")
+          },
         },
         watch: {
             map: {

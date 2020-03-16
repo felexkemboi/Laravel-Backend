@@ -61367,6 +61367,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -61416,6 +61432,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         chekiBtnText: {
             type: String,
             default: "Submit"
+        },
+        Home: {
+            type: String,
+            default: "Home"
         },
         submitBtnText: {
             type: String,
@@ -61487,36 +61507,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
 
     methods: {
-        click: function click() {
+        handleErrorMessage: function handleErrorMessage(errorMsg) {
+            this.errorMsg = errorMsg;
+        },
+        upload_file: function upload_file() {
             var _this2 = this;
 
             return new Promise(function (resolve, reject) {
-                _this2.$refs.upload.click().then(function (data) {
-                    _this2.isLoading = true;
+                if (_this2.$refs.upload.click()) {
+                    _this2.$refs.upload.click();
                     resolve(true);
-                }).catch(function (error) {
-                    console.log(err);
-                    reject(error);
-                    _this2.isLoading = true;
-                });
+                } else {
+                    reject(false);
+                }
             });
-        },
-
-        handleErrorMessage: function handleErrorMessage(errorMsg) {
-            this.errorMsg = errorMsg;
         },
         match: function match() {
             var _this3 = this;
 
             return new Promise(function (resolve, reject) {
-                _this3.$refs.columns.click().then(function (data) {
-                    _this3.isLoading = true;
+                if (_this3.$refs.columns.click()) {
+                    _this3.$refs.columns.click();
+                    //console.log("Just matched!")
                     resolve(true);
-                }).catch(function (error) {
-                    console.log(err);
-                    reject(error);
-                    _this3.isLoading = true;
-                });
+                } else {
+                    reject(false);
+                    //console.log("not matched!")
+                }
             });
         },
         submit: function submit() {
@@ -61534,7 +61551,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this.callback(this.form.csv);
             }
         },
-        chekthis: function chekthis() {
+        laststep: function laststep() {
             var _this4 = this;
 
             this.$refs.wizard.changeTab(1, 2);
@@ -61550,6 +61567,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 console.log("This was successfully done");
             }).catch(function (err) {
                 console.log(err);
+            });
+        },
+        load: function load() {
+            var _this5 = this;
+
+            this.$refs.wizard.changeTab(0, 1);
+            var _this = this;
+            this.readFile(function (output) {
+                _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
+                _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
+
+                for (var i = 0; i < _this.sample[0].length; i++) {
+                    _this5.options.push(_this.sample[0][i]);
+                }
             });
         },
         buildMappedCsv: function buildMappedCsv() {
@@ -61582,20 +61613,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         validateMimeType: function validateMimeType(type) {
             return this.fileMimeTypes.indexOf(type) > -1;
         },
-        load: function load() {
-            var _this5 = this;
-
-            this.$refs.wizard.changeTab(0, 1);
-            var _this = this;
-            this.readFile(function (output) {
-                _this.sample = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { preview: 2, skipEmptyLines: true }), "data");
-                _this.csv = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2_papaparse___default.a.parse(output, { skipEmptyLines: true }), "data");
-
-                for (var i = 0; i < _this.sample[0].length; i++) {
-                    _this5.options.push(_this.sample[0][i]);
-                }
-            });
-        },
         readFile: function readFile(callback) {
             var file = this.$refs.csv.files[0];
 
@@ -61617,6 +61634,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         handleValueChange: function handleValueChange(e) {
             var option = e.target.value;
             this.isUsed = _extends({}, this.isUsed, _defineProperty({}, option, true));
+        },
+        backhome: function backhome() {
+            console.log("Home button now");
         }
     },
     watch: {
@@ -62214,27 +62234,31 @@ var render = function() {
         "form-wizard",
         {
           ref: "wizard",
-          attrs: { color: "#1CD171", "error-color": "#1CD171" },
+          attrs: { color: "#8191BD", "error-color": "#0080ff" },
           on: {
             "on-complete": _vm.onComplete,
             "on-error": _vm.handleErrorMessage
           }
         },
         [
-          _c("h2", { attrs: { slot: "title" }, slot: "title" }, [
-            _vm._v("Upload File")
-          ]),
-          _vm._v(" "),
           _c(
             "tab-content",
             {
               attrs: {
                 title: "Upload File",
                 icon: "ti-file",
-                "before-change": _vm.click
+                "before-change": _vm.upload_file
               }
             },
             [
+              _vm.errorMsg
+                ? _c("div", [
+                    _c("span", { staticClass: "error" }, [
+                      _vm._v(_vm._s(_vm.errorMsg))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("div", { staticClass: "vue-csv-uploader-part-one" }, [
                 _c(
                   "div",
@@ -62281,10 +62305,7 @@ var render = function() {
                           {
                             ref: "upload",
                             class: _vm.buttonClass,
-                            staticStyle: {
-                              display: "none",
-                              visibility: "hidden"
-                            },
+                            staticStyle: { display: "none" },
                             attrs: {
                               type: "submit",
                               disabled: _vm.disabledNextButton
@@ -62424,10 +62445,7 @@ var render = function() {
                             {
                               ref: "columns",
                               class: _vm.buttonClass,
-                              staticStyle: {
-                                display: "none",
-                                visibility: "hidden"
-                              },
+                              staticStyle: { display: "none" },
                               attrs: {
                                 type: "submit",
                                 disabled: _vm.disabledNextButton
@@ -62435,14 +62453,14 @@ var render = function() {
                               on: {
                                 click: function($event) {
                                   $event.preventDefault()
-                                  return _vm.chekthis($event)
+                                  return _vm.laststep($event)
                                 }
                               }
                             },
                             [
                               _vm._v(
                                 "\n                          " +
-                                  _vm._s(_vm.chekiBtnText) +
+                                  _vm._s(_vm.LastStep) +
                                   "\n                      "
                               )
                             ]
@@ -62457,12 +62475,58 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("tab-content", { attrs: { title: "Finish", icon: "ti-check" } }, [
+            _vm.errorMsg
+              ? _c("div", [
+                  _c("span", { staticClass: "error" }, [
+                    _vm._v(_vm._s(_vm.errorMsg))
+                  ])
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "button",
+                {
+                  class: _vm.buttonClass,
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.backhome($event)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                " + _vm._s(_vm.Home) + "\n            "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  class: _vm.buttonClass,
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.backhome($event)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                  " +
+                      _vm._s(_vm.Home) +
+                      "\n              "
+                  )
+                ]
+              )
+            ]),
+            _vm._v(" "),
             _c("div", { staticClass: "mt-2" }, [
-              _c("div", { staticClass: "panel-body" }, [
-                _vm._v(
-                  "\n                " + _vm._s(_vm.data) + "\n\n              "
-                )
-              ])
+              _c("div", { staticClass: "panel-body" })
             ])
           ])
         ],
