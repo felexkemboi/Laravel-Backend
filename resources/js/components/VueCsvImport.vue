@@ -22,7 +22,7 @@
                   </div>
                   <div class="form-group">
                       <slot name="next" :load="load">
-                          <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load"> <!-- style="display:none;" visibility:hidden;   ref="load_file" -->
+                          <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load" style="float:right;"> <!-- style="display:none;" visibility:hidden;   ref="load_file" -->
                               {{ loadBtnText }}
                           </button>
                       </slot>
