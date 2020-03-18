@@ -24,11 +24,11 @@ window.Vue = require('vue');
  */
 Vue.component('upload', require('./components/upload'));
 Vue.component('vuecsvimport', require('./components/VueCsvImport'));
-Vue.component('todo', require('./components/Todo'))
+/*Vue.component('todo', require('./components/Todo'))
 Vue.component('new-todo', require('./components/NewTodo.vue'))
 Vue.component('todo-list', require('./components/TodoList'))
 Vue.component('todo-app', require('./components/TodoApp'))
-Vue.component('Tasks', require('./components/Tasks'))
+Vue.component('Tasks', require('./components/Tasks'))*/
 Vue.component('dbnames', require('./components/dbnames'))
 
 

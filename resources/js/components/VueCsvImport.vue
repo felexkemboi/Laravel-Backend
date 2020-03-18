@@ -37,7 +37,7 @@
                   <span class="error">{{errorMsg}}</span>
                 </div>
                 <div v-if="errors">
-                  <p style="color:pink;">{{ errors[0] }}</p>
+                  <p style="color:green;">{{ errors[0] }}</p>
                 </div>
                 <div class="vue-csv-mapping" v-if="sample">
                     <table :class="tableClass">
@@ -109,7 +109,7 @@
             value: Array,
             title: {
             type: String,
-            default: 'yy'
+            default: ''
           },
             subtitle: {
               type: String,
@@ -356,10 +356,11 @@
             };
           },
           backhome() {
-              console.log("Home button now")
+              location.replace('http://127.0.0.1:8000/');
           },
           redirect_to_upload() { // this method is called on button click
-            console.log("Upload Again")
+            //console.log("Upload Again")
+            location.replace('http://127.0.0.1:8000/csv');
           }
         },
         watch: {
