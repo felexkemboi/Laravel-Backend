@@ -37,7 +37,7 @@
                   <span class="error">{{errorMsg}}</span>
                 </div>
                 <div v-if="errors">
-                  <p style="color:red;">{{ errors[0] }}</p>
+                  <p style="color:pink;">{{ errors[0] }}</p>
                 </div>
                 <div class="vue-csv-mapping" v-if="sample">
                     <table :class="tableClass">
@@ -73,7 +73,7 @@
                 <span class="error">{{errorMsg}}</span>
               </div>
               <div v-if="errors">
-                <p style="color:red;">{{ errors[0] }}</p>
+                <p style="color:red;">{{ errors[1] }}</p>
               </div>
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
@@ -389,9 +389,27 @@
                             this.errors = [];
                             this.submit();
                           }else{
+                          this.errors.push("Please make sure you match Full Name and Loan Amount.");
+                          this.errors.push("Please make sure you match Full Name");
+                          console.log("Fill all the columns first")
+                        }
+                        /*
+
+                        if (hasAllKeys) {
+                            this.errors = [];
+                            this.submit();
+                          }else{
                           this.errors.push("Full Name and Loan Amount Fields must be Matched.");
                           console.log("Fill all the columns first")
                         }
+
+                        try {
+
+                          this.errors = [];
+                          this.submit();
+                        } catch(err) {
+                            console.log('Ohh no:', err.message);
+                        } */
 
 
                         //this.submit();

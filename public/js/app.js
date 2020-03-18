@@ -61704,9 +61704,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                         this.errors = [];
                         this.submit();
                     } else {
-                        this.errors.push("Full Name and Loan Amount Fields must be Matched.");
+                        this.errors.push("Please make sure you match Full Name and Loan Amount.");
+                        this.errors.push("Please make sure you match Full Name");
                         console.log("Fill all the columns first");
                     }
+                    /*
+                     if (hasAllKeys) {
+                        this.errors = [];
+                        this.submit();
+                      }else{
+                      this.errors.push("Full Name and Loan Amount Fields must be Matched.");
+                      console.log("Fill all the columns first")
+                    }
+                     try {
+                       this.errors = [];
+                      this.submit();
+                    } catch(err) {
+                        console.log('Ohh no:', err.message);
+                    } */
 
                     //this.submit();
                 }
@@ -62405,13 +62420,13 @@ var render = function() {
                     ])
                   : _vm._e(),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  _vm._l(_vm.errors, function(error) {
-                    return _c("p", [_vm._v(_vm._s(error))])
-                  }),
-                  0
-                ),
+                _vm.errors
+                  ? _c("div", [
+                      _c("p", { staticStyle: { color: "pink" } }, [
+                        _vm._v(_vm._s(_vm.errors[0]))
+                      ])
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _vm.sample
                   ? _c("div", { staticClass: "vue-csv-mapping" }, [
@@ -62541,7 +62556,11 @@ var render = function() {
               : _vm._e(),
             _vm._v(" "),
             _vm.errors
-              ? _c("div", [_c("p", [_vm._v(_vm._s(_vm.errors))])])
+              ? _c("div", [
+                  _c("p", { staticStyle: { color: "red" } }, [
+                    _vm._v(_vm._s(_vm.errors[1]))
+                  ])
+                ])
               : _vm._e(),
             _vm._v(" "),
             _c("div", { staticClass: "row" }, [
