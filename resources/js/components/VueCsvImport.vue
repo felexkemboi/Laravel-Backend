@@ -36,6 +36,9 @@
                 <div v-if="errorMsg">
                   <span class="error">{{errorMsg}}</span>
                 </div>
+                <div>
+                  <p v-for="error in errors">{{ error }}</p>
+                </div>
                 <div class="vue-csv-mapping" v-if="sample">
                     <table :class="tableClass">
                           <slot name="thead">
@@ -68,6 +71,9 @@
             <tab-content title="Finish" icon="ti-check">
               <div v-if="errorMsg">
                 <span class="error">{{errorMsg}}</span>
+              </div>
+              <div v-if="errors">
+                <p>{{ errors }}</p>
               </div>
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
@@ -203,7 +209,8 @@
             fileSelected: false,
             data:null,
             options:[],
-            isUsed: {}
+            isUsed: {},
+            errors:[]
 
         }),
         created() {
@@ -374,16 +381,19 @@
 
                         let hasAllKeys = Array.isArray(this.must) ? _.every(this.must, function (item) {
                             return newVal.hasOwnProperty(item);
-                        }) : _.every(this.this.must, function (item, key) {
+                         }) : _.every(this.this.must, function (item, key) {
                             return newVal.hasOwnProperty(key);
-                        });
+                          });
 
                         if (hasAllKeys) {
-                          //console.log(this.mapFields)
+                            this.errors = [];
                             this.submit();
-                        }else{
+                          }else{
+                          this.errors.push("Full Name and Loan Amount Fields must be Matched.");
                           console.log("Fill all the columns first")
                         }
+
+
                         //this.submit();
                     }
                 }

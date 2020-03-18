@@ -48,7 +48,7 @@ class TaskController extends Controller
 
 	public function dbnames(Request $request){
 		//$columns = Schema::Connection('todo')->getColumnListing('tasks'); // 'business' is your database connection
-		$list_of_names_in_db = [];
+		/*$list_of_names_in_db = [];
 
 		$crud_names = [];
 
@@ -71,8 +71,14 @@ class TaskController extends Controller
 		    if(in_array($name,$names)) {
 		        array_push($list_of_names_in_db, $name);
 		    }
-		}
-		//Storage::disk('local')->put('data.json', json_encode($list_of_names_in_db));
+		} */
+
+		//This is just but a list of columns that are to be matched
+		$list_of_names_in_db = ['Full Name','Loan Amount','Contract No','Loan Taken Date','Loan Due Date',
+							 'Account No','Branch Title',
+							 'Employee Email','Employee Name','NOK Name','NOK phone',
+							 'NOK Address','NOK Email','NOK Contacts','GUA Name','GUA Email','GUA Address'
+						 ];
 
 		return response()->json($list_of_names_in_db);
 	}
