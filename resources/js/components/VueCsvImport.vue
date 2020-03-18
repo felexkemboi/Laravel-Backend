@@ -36,8 +36,8 @@
                 <div v-if="errorMsg">
                   <span class="error">{{errorMsg}}</span>
                 </div>
-                <div>
-                  <p v-for="error in errors">{{ error }}</p>
+                <div v-if="errors">
+                  <p style="color:red;">{{ errors[0] }}</p>
                 </div>
                 <div class="vue-csv-mapping" v-if="sample">
                     <table :class="tableClass">
@@ -73,7 +73,7 @@
                 <span class="error">{{errorMsg}}</span>
               </div>
               <div v-if="errors">
-                <p>{{ errors }}</p>
+                <p style="color:red;">{{ errors[0] }}</p>
               </div>
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
