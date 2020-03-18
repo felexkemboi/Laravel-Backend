@@ -72,8 +72,8 @@
 
           <div id="app">
                     <!--<todo-app></todo-app> -->
-                    <Tasks></Tasks>
-                    <VueCsvImport></VueCsvImport>
+                    <!--<Tasks></Tasks>
+                    <VueCsvImport></VueCsvImport> -->
 
           </div>
 
