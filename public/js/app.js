@@ -61295,6 +61295,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_mime_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_mime_types__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 //
@@ -61496,6 +61498,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             form: {
                 csv: null
             },
+            must: [],
+            loading: true,
             errorMsg: null,
             fieldsToMap: [],
             map: {},
@@ -61671,15 +61675,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             deep: true,
             handler: function handler(newVal) {
                 if (!this.url) {
+
+                    this.must.push(this.mapFields[0]);
+                    this.must.push(this.mapFields[1]);
+                    this.must = [].concat(_toConsumableArray(new Set(this.must)));
+                    //console.log(this.must)
+
                     /*let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
                         return newVal.hasOwnProperty(item);
                     }) : _.every(this.mapFields, function (item, key) {
                         return newVal.hasOwnProperty(key);
+                    }); */
+
+                    var hasAllKeys = Array.isArray(this.must) ? __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.every(this.must, function (item) {
+                        return newVal.hasOwnProperty(item);
+                    }) : __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.every(this.this.must, function (item, key) {
+                        return newVal.hasOwnProperty(key);
                     });
-                     if (hasAllKeys) {
+
+                    if (hasAllKeys) {
+                        //console.log(this.mapFields)
                         this.submit();
-                    }*/
-                    this.submit();
+                    } else {
+                        console.log("Fill all the columns first");
+                    }
+                    //this.submit();
                 }
             }
         }

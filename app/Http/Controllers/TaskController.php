@@ -55,7 +55,7 @@ class TaskController extends Controller
 		$tables = ['debtors','case_files','branches','employers','guarantors','phones','emails','next_of_kins']; //,
 
 		$names = ['loan_amount','contract_no','loan_taken_date','loan_due_date',
-							 'account_no','branch_title','full_name','debtor_ID',
+							 'account_no','branch_title','full_name',
 							 'employee_email','employee_name','nok_name','nok_phone',
 							 'nok_address','nok_email','nok_contacts','gua_name','gua_email','gua_address'
 						 ];

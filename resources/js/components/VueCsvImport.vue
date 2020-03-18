@@ -191,6 +191,8 @@
             form: {
                 csv: null,
             },
+            must :[],
+            loading: true,
             errorMsg: null,
             fieldsToMap: [],
             map: {},
@@ -358,16 +360,31 @@
                 deep: true,
                 handler: function (newVal) {
                     if (!this.url) {
+
+                        this.must.push(this.mapFields[0])
+                        this.must.push(this.mapFields[1])
+                        this.must = [...new Set(this.must)];
+                        //console.log(this.must)
+
                         /*let hasAllKeys = Array.isArray(this.mapFields) ? _.every(this.mapFields, function (item) {
                             return newVal.hasOwnProperty(item);
                         }) : _.every(this.mapFields, function (item, key) {
                             return newVal.hasOwnProperty(key);
+                        }); */
+
+                        let hasAllKeys = Array.isArray(this.must) ? _.every(this.must, function (item) {
+                            return newVal.hasOwnProperty(item);
+                        }) : _.every(this.this.must, function (item, key) {
+                            return newVal.hasOwnProperty(key);
                         });
 
                         if (hasAllKeys) {
+                          //console.log(this.mapFields)
                             this.submit();
-                        }*/
-                        this.submit();
+                        }else{
+                          console.log("Fill all the columns first")
+                        }
+                        //this.submit();
                     }
                 }
             }
