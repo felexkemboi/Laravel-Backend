@@ -69,12 +69,17 @@
 
             <!--This is the third and final tab -->
             <tab-content title="Finish" icon="ti-check">
-              <div v-if="errorMsg">
-                <span class="error">{{errorMsg}}</span>
+              <div>
+                <div v-if="errorMsg">
+                  <span class="error">{{errorMsg}}</span>
+                </div>
+                <div v-else="errors">
+                  <p style="color:red;">{{ errors[1] }}</p>
+                </div>
               </div>
-              <div v-if="errors">
-                <p style="color:red;">{{ errors[1] }}</p>
-              </div>
+            <div>
+              <p><h3 style="color:green;">Data successfully loaded!</h3></p>
+            </div>
               <div class='row'>
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     {{ upload_Again }}
@@ -356,11 +361,11 @@
             };
           },
           backhome() {
-              location.replace('http://127.0.0.1:8000/');
+              location.replace('http://127.0.0.1:8000');
           },
           redirect_to_upload() { // this method is called on button click
             //console.log("Upload Again")
-            location.replace('http://127.0.0.1:8000/csv');
+            location.replace('http://127.0.0.1:8000');
           }
         },
         watch: {

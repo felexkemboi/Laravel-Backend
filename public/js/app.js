@@ -21590,35 +21590,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css__ = __webpack_require__(73);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_vue_themify_icons__ = __webpack_require__(76);
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
 
-__webpack_require__(22);
 __webpack_require__(16);
 
 
 window.Vue = __webpack_require__(7);
-//import Vue from 'vue'
-//import VueRouter from 'vue-router'
+window.axios = __webpack_require__(4);
+window._ = __webpack_require__(8);
+window.Popper = __webpack_require__(9).default;
 
-//Vue.use(VueRouter)
-
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
 Vue.component('upload', __webpack_require__(58));
 Vue.component('vuecsvimport', __webpack_require__(17));
-/*Vue.component('todo', require('./components/Todo'))
-Vue.component('new-todo', require('./components/NewTodo.vue'))
-Vue.component('todo-list', require('./components/TodoList'))
-Vue.component('todo-app', require('./components/TodoApp'))
-Vue.component('Tasks', require('./components/Tasks'))*/
 Vue.component('dbnames', __webpack_require__(63));
 
 
@@ -21634,75 +21616,12 @@ Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_2__VueCsvImport__["VueCsvImportPlugin"]);
 
 var app = new Vue({
-  el: '#app',
-  store: __WEBPACK_IMPORTED_MODULE_1__js_store__["a" /* default */]
+    el: '#app',
+    store: __WEBPACK_IMPORTED_MODULE_1__js_store__["a" /* default */]
 });
 
 /***/ }),
-/* 22 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-window._ = __webpack_require__(8);
-window.Popper = __webpack_require__(9).default;
-window.axios = __webpack_require__(4);
-
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-
-/*
-try {
-    window.$ = window.jQuery = require('jquery');
-
-    require('bootstrap');
-} catch (e) {}
-*/
-
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
-//window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-/**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-
-/*
-let token = document.head.querySelector('meta[name="csrf-token"]');
-
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-} */
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
-
-/*
-import Echo from 'laravel-echo'
-
-window.Pusher = require('pusher-js');
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-    encrypted: false
-});
-*/
-
-/***/ }),
+/* 22 */,
 /* 23 */
 /***/ (function(module, exports) {
 
@@ -34984,6 +34903,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -35256,12 +35180,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             this.isUsed = _extends({}, this.isUsed, _defineProperty({}, option, true));
         },
         backhome: function backhome() {
-            location.replace('http://127.0.0.1:8000/');
+            location.replace('http://127.0.0.1:8000');
         },
         redirect_to_upload: function redirect_to_upload() {
             // this method is called on button click
             //console.log("Upload Again")
-            location.replace('http://127.0.0.1:8000/csv');
+            location.replace('http://127.0.0.1:8000');
         }
     },
     watch: {
@@ -36134,21 +36058,27 @@ var render = function() {
           ),
           _vm._v(" "),
           _c("tab-content", { attrs: { title: "Finish", icon: "ti-check" } }, [
-            _vm.errorMsg
-              ? _c("div", [
-                  _c("span", { staticClass: "error" }, [
-                    _vm._v(_vm._s(_vm.errorMsg))
+            _c("div", [
+              _vm.errorMsg
+                ? _c("div", [
+                    _c("span", { staticClass: "error" }, [
+                      _vm._v(_vm._s(_vm.errorMsg))
+                    ])
                   ])
-                ])
-              : _vm._e(),
+                : _c("div", [
+                    _c("p", { staticStyle: { color: "red" } }, [
+                      _vm._v(_vm._s(_vm.errors[1]))
+                    ])
+                  ])
+            ]),
             _vm._v(" "),
-            _vm.errors
-              ? _c("div", [
-                  _c("p", { staticStyle: { color: "red" } }, [
-                    _vm._v(_vm._s(_vm.errors[1]))
-                  ])
-                ])
-              : _vm._e(),
+            _c("div", [
+              _c("p"),
+              _c("h3", { staticStyle: { color: "green" } }, [
+                _vm._v("Data successfully loaded!")
+              ]),
+              _c("p")
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "row" }, [
               _c(
