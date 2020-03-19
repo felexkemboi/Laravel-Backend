@@ -15,12 +15,6 @@ use Illuminate\Support\Facades\Storage;
 class TaskController extends Controller
 {
 	//
-	public function fetchAll(){
-
-		$tasks = Task::all();
-
-		return $tasks;
-	}
 
 	public function store(Request $request){
 
