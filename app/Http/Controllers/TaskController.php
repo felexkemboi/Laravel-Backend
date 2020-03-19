@@ -16,14 +16,6 @@ class TaskController extends Controller
 {
 	//
 
-		$task = Task::create($request->all());
-
-
-		broadcast(new TaskCreated($task));
-
-		return response()->json("added");
-	}
-
 	public function home(Request $request){
 		$tasks = Task::all();
 		return response()->json($tasks);
