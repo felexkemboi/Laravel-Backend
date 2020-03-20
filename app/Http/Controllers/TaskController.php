@@ -16,10 +16,6 @@ class TaskController extends Controller
 {
 	//
 
-	public function home(Request $request){
-		$tasks = Task::all();
-		return response()->json($tasks);
-	}
 
 	public function recievedata(Request $request){
 		print_r($request->all());
