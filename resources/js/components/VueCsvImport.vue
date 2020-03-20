@@ -279,9 +279,8 @@
             this.$refs.wizard.changeTab(1,2)
             const _this = this;
             console.log('The number of items in my CSV is ' + this.form.csv.length);
-
-            //axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
-            console.log(this.form.csv)
+            //console.log(this.form.csv)
+            axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
             .then((response) => {
                 this.data = response
                 console.log("Data sent to http://127.0.0.1:8000/api/csv ")

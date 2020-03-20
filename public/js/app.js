@@ -31610,9 +31610,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             this.$refs.wizard.changeTab(1, 2);
             var _this = this;
             console.log('The number of items in my CSV is ' + this.form.csv.length);
-
-            //axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
-            console.log(this.form.csv).then(function (response) {
+            //console.log(this.form.csv)
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('http://127.0.0.1:8000/api/csv', this.form.csv).then(function (response) {
                 _this4.data = response;
                 console.log("Data sent to http://127.0.0.1:8000/api/csv ");
                 _this4.data = _this4.form.csv;
