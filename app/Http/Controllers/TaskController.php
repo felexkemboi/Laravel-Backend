@@ -19,7 +19,6 @@ class TaskController extends Controller
 
 	public function recievedata(Request $request){
 		print_r($request->all());
-		//print_r("This endpoint confirms to have recieved the data");
 		return response() ->json([$request->all()]);
 	}
 
