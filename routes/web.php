@@ -11,5 +11,5 @@
 |
 */
 Route::get('/', function () {
-    return view('csv');
+    return view('upload');
 });

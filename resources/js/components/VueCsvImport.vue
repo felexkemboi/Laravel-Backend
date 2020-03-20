@@ -1,5 +1,7 @@
 
 <template>
+      <div id="app">
+        <h4 class="mb-4">Upload the CSV File below</h4>
         <div class="form">
           <form-wizard
               ref="wizard"
@@ -80,7 +82,7 @@
             <div>
               <p><h3 style="color:green;">Data successfully loaded!</h3></p>
             </div>
-              <div class='row'>
+              <div class='row' style="align:centre;">
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     {{ upload_Again }}
                 </button>
@@ -89,16 +91,11 @@
                     {{ back_Home }}
                   </button>
               </div>
-                <div class="mt-2">
-                  <div class="panel-body">
-                    <!--{{ data }} -->
-
-                  </div>
-                </div>
             </tab-content>
 
           </form-wizard>
         </div>
+      </div>
     </div>
 </template>
 
@@ -124,7 +121,8 @@
                 type: String
             },
             mapFields: {
-                required: false //true
+                required: false, //true
+                default:['Full Name','Loan Amount','Contract No','Loan Taken Date','Loan Due Date','Account No','Branch Title','Employee Email','Employee Name','NOK Name','NOK phone']
             },
             callback: {
                 type: Function,
@@ -282,7 +280,8 @@
             const _this = this;
             console.log('The number of items in my CSV is ' + this.form.csv.length);
 
-            axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
+            //axios.post('http://127.0.0.1:8000/api/csv', this.form.csv)
+            console.log(this.form.csv)
             .then((response) => {
                 this.data = response
                 console.log("Data sent to http://127.0.0.1:8000/api/csv ")

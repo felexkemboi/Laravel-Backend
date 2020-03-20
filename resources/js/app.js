@@ -7,9 +7,7 @@ window.axios = require('axios');
 window._ = require('lodash');
 window.Popper = require('popper.js').default;
 
-Vue.component('upload', require('./components/upload'));
 Vue.component('vuecsvimport', require('./components/VueCsvImport'));
-Vue.component('dbnames', require('./components/dbnames'))
 
 
 import store from '../js/store'

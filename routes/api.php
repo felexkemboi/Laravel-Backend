@@ -18,11 +18,3 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 	return $request->user();
 }
 );
-Route::post('/csv','TaskController@recievedata');
-Route::get('/','TaskController@home');
-Route::get('/csv','TaskController@csv');
-Route::get('/dbnames','TaskController@dbnames');
-//Route::get('todos','TaskController@fetchAll');
-//Route::post('todos','TaskController@store');
-//Route::put('todos/{id}','TaskController@update');
-//Route::delete('todos/{id}','TaskController@delete');
