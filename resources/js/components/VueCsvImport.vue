@@ -25,7 +25,7 @@
                   <div class="form-group">
                       <slot name="next" :load="load">
                           <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load" style="float:right;"> <!-- style="display:none;" visibility:hidden;   ref="load_file" -->
-                              {{ loadBtnText }}
+                               Upload File
                           </button>
                       </slot>
                   </div>
@@ -71,17 +71,17 @@
 
             <!--This is the third and final tab -->
             <tab-content title="Finish" icon="ti-check">
-            <div>
-              <div v-if="errorMsg">
-                <span class="error">{{errorMsg}}</span>
+              <div>
+                <div v-if="errorMsg">
+                  <span class="error">{{errorMsg}}</span>
+                </div>
+                <div v-else="errors">
+                  <p style="color:green;">{{ errors[0] }}</p>
+                </div>
+                <div v-if="with_errors">
+                  <p><h3 style="color:green;">Data successfully loaded!</h3></p>
+                </div>
               </div>
-              <div v-else="errors">
-                <p style="color:green;">{{ errors[0] }}</p>
-              </div>
-              <div v-if="with_errors">
-                <p><h3 style="color:green;">Data successfully loaded!</h3></p>
-              </div>
-            </div>
               <div class='row' style="align:centre;">
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     {{ upload_Again }}
@@ -112,10 +112,6 @@
             title: {
             type: String,
             default: ''
-          },
-            subtitle: {
-              type: String,
-              default: ''
             },
             url: {
                 type: String
@@ -144,10 +140,6 @@
             },
             headers: {
                 default: null
-            },
-            loadBtnText: {
-                type: String,
-                default: "Upload File"
             },
             LastStep: {
                 type: String,
@@ -324,7 +316,11 @@
             });
           },
           validFileMimeType() {
+
+            //pick the file selected
             let file = this.$refs.csv.files[0];
+
+            //check the type of the file and assign to a variable mimetype...
             const mimeType = file.type === "" ? mimeTypes.lookup(file.name) : file.type;
 
             if (file) {

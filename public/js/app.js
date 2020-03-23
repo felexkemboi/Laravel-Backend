@@ -31429,10 +31429,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             type: String,
             default: ''
         },
-        subtitle: {
-            type: String,
-            default: ''
-        },
         url: {
             type: String
         },
@@ -31466,10 +31462,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         },
         headers: {
             default: null
-        },
-        loadBtnText: {
-            type: String,
-            default: "Upload File"
         },
         LastStep: {
             type: String,
@@ -31658,7 +31650,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             });
         },
         validFileMimeType: function validFileMimeType() {
+
+            //pick the file selected
             var file = this.$refs.csv.files[0];
+
+            //check the type of the file and assign to a variable mimetype...
             var mimeType = file.type === "" ? __WEBPACK_IMPORTED_MODULE_3_mime_types___default.a.lookup(file.name) : file.type;
 
             if (file) {
@@ -33276,9 +33272,7 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                          " +
-                                  _vm._s(_vm.loadBtnText) +
-                                  "\n                      "
+                                "\n                           Upload File\n                      "
                               )
                             ]
                           )
