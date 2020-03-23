@@ -31574,7 +31574,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this.callback(this.form.csv);
             }
         },
-        laststep: function laststep() {
+        last_tab: function last_tab() {
             var _this4 = this;
 
             this.$refs.wizard.changeTab(1, 2);
@@ -33237,7 +33237,7 @@ var render = function() {
                             "button",
                             {
                               class: _vm.buttonClass,
-                              staticStyle: { float: "right" },
+                              staticStyle: { "margin-left": "30%" },
                               attrs: {
                                 type: "submit",
                                 disabled: _vm.disabledNextButton
@@ -33383,6 +33383,7 @@ var render = function() {
                               "button",
                               {
                                 class: _vm.buttonClass,
+                                staticStyle: { "margin-left": "194%" },
                                 attrs: {
                                   type: "submit",
                                   disabled: _vm.name_amount
@@ -33390,7 +33391,7 @@ var render = function() {
                                 on: {
                                   click: function($event) {
                                     $event.preventDefault()
-                                    return _vm.laststep($event)
+                                    return _vm.last_tab($event)
                                   }
                                 }
                               },
@@ -33455,7 +33456,7 @@ var render = function() {
                       },
                       [_vm._v("\n                Upload Again\n            ")]
                     ),
-                    _vm._v("\n               \n            "),
+                    _vm._v("\n              \n            "),
                     _c(
                       "button",
                       {

@@ -24,7 +24,7 @@
                   </div>
                   <div class="form-group">
                       <slot name="next" :load="load">
-                          <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load" style="float:right;"> <!-- style="display:none;" visibility:hidden;   ref="load_file" -->
+                          <button   type="submit" :disabled="disabledNextButton" :class="buttonClass" @click.prevent="load"  style="margin-left: 30%;"> <!--style="float:right;"  style="display:none;" visibility:hidden;   ref="load_file" -->
                                Upload File
                           </button>
                       </slot>
@@ -61,7 +61,7 @@
                               </td>
                           </tr>
                           </tbody>
-                        <button type="submit"  :disabled="name_amount" :class="buttonClass"  @click.prevent="laststep"><!-- :disabled="disabledNextButton" style="display:none;"visibility:hidden;   ref="columns" -->
+                        <button type="submit"  :disabled="name_amount" :class="buttonClass"  @click.prevent="last_tab" style="margin-left: 194%;"><!-- :disabled="disabledNextButton" style="display:none;"visibility:hidden;   ref="columns" -->
                               Match Columns
                           </button>
                       </table>
@@ -86,7 +86,7 @@
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     Upload Again
                 </button>
-                &#160;&#160;&#160;
+                &#160;&#160;
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
                     Back Home
                   </button>
@@ -245,7 +245,7 @@
                       _this.callback(this.form.csv);
                   }
           },
-          laststep(){
+          last_tab(){
             this.$refs.wizard.changeTab(1,2)
             const _this = this;
             console.log('The number of items in my CSV is ' + this.form.csv.length);
