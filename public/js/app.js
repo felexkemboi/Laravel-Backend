@@ -31425,10 +31425,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
         value: Array,
-        title: {
-            type: String,
-            default: ''
-        },
         url: {
             type: String
         },
@@ -31504,6 +31500,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             csv: null,
             sample: null,
             isValidFileMimeType: false,
+            name_amount: true,
             fileSelected: false,
             data: null,
             options: [],
@@ -31704,6 +31701,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                     if (hasAllKeys) {
                         this.errors = [];
+                        //!this.isValidFileMimeType
+                        this.name_amount = false;
                         this.submit();
                     } else {
                         this.errors.push("Please make sure you match Full Name and Loan Amount.");
@@ -33386,7 +33385,7 @@ var render = function() {
                                 class: _vm.buttonClass,
                                 attrs: {
                                   type: "submit",
-                                  disabled: _vm.disabledNextButton
+                                  disabled: _vm.name_amount
                                 },
                                 on: {
                                   click: function($event) {
