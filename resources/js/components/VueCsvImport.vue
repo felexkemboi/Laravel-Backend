@@ -1,7 +1,6 @@
 
 <template>
       <div id="app">
-        <h4 class="mb-4">Upload the CSV File below</h4>
         <div class="form">
           <form-wizard
               ref="wizard"
@@ -10,6 +9,7 @@
               @on-error="handleErrorMessage"
               @on-complete="onComplete"
               :hide-buttons="true">
+              <h3 slot="title">Upload the CSV File below</h3>
 
             <!--This is the first  tab, before it changes to the next tab,it calls a function to upload the file, upload_file  -->
             <tab-content title="Upload File" icon="ti-file"  :before-change="upload_file">
@@ -38,7 +38,7 @@
                 <div v-if="errorMsg">
                   <span class="error">{{errorMsg}}</span>
                 </div>
-                <div v-if="errors">
+                <div v-else-if="errors">
                   <p style="color:green;">{{ errors[0] }}</p>
                 </div>
                 <div class="vue-csv-mapping" v-if="sample">
@@ -71,16 +71,16 @@
 
             <!--This is the third and final tab -->
             <tab-content title="Finish" icon="ti-check">
-              <div>
-                <div v-if="errorMsg">
-                  <span class="error">{{errorMsg}}</span>
-                </div>
-                <div v-else="errors">
-                  <p style="color:red;">{{ errors[1] }}</p>
-                </div>
-              </div>
             <div>
-              <p><h3 style="color:green;">Data successfully loaded!</h3></p>
+              <div v-if="errorMsg">
+                <span class="error">{{errorMsg}}</span>
+              </div>
+              <div v-else="errors">
+                <p style="color:green;">{{ errors[0] }}</p>
+              </div>
+              <div v-if="with_errors">
+                <p><h3 style="color:green;">Data successfully loaded!</h3></p>
+              </div>
             </div>
               <div class='row' style="align:centre;">
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
@@ -213,7 +213,8 @@
             data:null,
             options:[],
             isUsed: {},
-            errors:[]
+            errors:[],
+            with_errors:false
 
         }),
         created() {
@@ -289,6 +290,11 @@
                 //console.log(response.data)
                 console.log("This was successfully done")
             }).catch(err => { console.log(err)});
+            if(this.errors.length>0){
+              console.log("iko na errors")
+            }else{
+              console.log("haina errors")
+            }
           },
           load() {
             this.$refs.wizard.changeTab(0,1)
@@ -395,7 +401,8 @@
                           }else{
                           this.errors.push("Please make sure you match Full Name and Loan Amount.");
                           this.errors.push("Please make sure you match Full Name");
-                          console.log("Fill all the columns first")
+                          this.with_errors = true
+                          //console.log("Fill all the columns first")
                         }
                         /*
 
@@ -429,6 +436,7 @@
               const vm = this;
               return this.options.filter(o => !!vm.isUsed[o])
             },
+            with_errors:false,
             showErrorMessage() {
                 return this.fileSelected && !this.isValidFileMimeType;
             },

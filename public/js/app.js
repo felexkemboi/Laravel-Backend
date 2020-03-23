@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 17);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,7 +70,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(12);
+var bind = __webpack_require__(11);
 var isBuffer = __webpack_require__(29);
 
 /*global toString:true*/
@@ -402,208 +402,17 @@ module.exports = g;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 if (false) {
   module.exports = require('./vue.common.prod.js')
 } else {
-  module.exports = __webpack_require__(20)
+  module.exports = __webpack_require__(19)
 }
 
 
 /***/ }),
-/* 5 */
+/* 3 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -793,13 +602,89 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 4 */
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(28);
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
 
 /***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -822,10 +707,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(13);
+    adapter = __webpack_require__(12);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(13);
+    adapter = __webpack_require__(12);
   }
   return adapter;
 }
@@ -900,18 +785,18 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 8 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "VueCsvImportPlugin", function() { return VueCsvImportPlugin; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "VueCsvImport", function() { return __WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport___default.a; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -935,15 +820,15 @@ if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== undefine
 /* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_1__components_VueCsvImport___default.a);
 
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(23)
+  __webpack_require__(22)
 }
-var normalizeComponent = __webpack_require__(3)
+var normalizeComponent = __webpack_require__(8)
 /* script */
 var __vue_script__ = __webpack_require__(26)
 /* template */
@@ -986,235 +871,116 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 8 */
+/***/ (function(module, exports) {
 
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-  Modified by Evan You @yyx990803
-*/
+/* globals __VUE_SSR_CONTEXT__ */
 
-var hasDocument = typeof document !== 'undefined'
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
 
-if (typeof DEBUG !== 'undefined' && DEBUG) {
-  if (!hasDocument) {
-    throw new Error(
-    'vue-style-loader cannot be used in a non-browser environment. ' +
-    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
-  ) }
-}
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
 
-var listToStyles = __webpack_require__(25)
-
-/*
-type StyleObject = {
-  id: number;
-  parts: Array<StyleObjectPart>
-}
-
-type StyleObjectPart = {
-  css: string;
-  media: string;
-  sourceMap: ?string
-}
-*/
-
-var stylesInDom = {/*
-  [id: number]: {
-    id: number,
-    refs: number,
-    parts: Array<(obj?: StyleObjectPart) => void>
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
   }
-*/}
 
-var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
-var singletonElement = null
-var singletonCounter = 0
-var isProduction = false
-var noop = function () {}
-var options = null
-var ssrIdKey = 'data-vue-ssr-id'
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
 
-// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-// tags it will allow on a page
-var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
 
-module.exports = function (parentId, list, _isProduction, _options) {
-  isProduction = _isProduction
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
 
-  options = _options || {}
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
 
-  var styles = listToStyles(parentId, list)
-  addStylesToDom(styles)
-
-  return function update (newList) {
-    var mayRemove = []
-    for (var i = 0; i < styles.length; i++) {
-      var item = styles[i]
-      var domStyle = stylesInDom[item.id]
-      domStyle.refs--
-      mayRemove.push(domStyle)
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
     }
-    if (newList) {
-      styles = listToStyles(parentId, newList)
-      addStylesToDom(styles)
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
     } else {
-      styles = []
-    }
-    for (var i = 0; i < mayRemove.length; i++) {
-      var domStyle = mayRemove[i]
-      if (domStyle.refs === 0) {
-        for (var j = 0; j < domStyle.parts.length; j++) {
-          domStyle.parts[j]()
-        }
-        delete stylesInDom[domStyle.id]
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
       }
     }
   }
-}
 
-function addStylesToDom (styles /* Array<StyleObject> */) {
-  for (var i = 0; i < styles.length; i++) {
-    var item = styles[i]
-    var domStyle = stylesInDom[item.id]
-    if (domStyle) {
-      domStyle.refs++
-      for (var j = 0; j < domStyle.parts.length; j++) {
-        domStyle.parts[j](item.parts[j])
-      }
-      for (; j < item.parts.length; j++) {
-        domStyle.parts.push(addStyle(item.parts[j]))
-      }
-      if (domStyle.parts.length > item.parts.length) {
-        domStyle.parts.length = item.parts.length
-      }
-    } else {
-      var parts = []
-      for (var j = 0; j < item.parts.length; j++) {
-        parts.push(addStyle(item.parts[j]))
-      }
-      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
-    }
-  }
-}
-
-function createStyleElement () {
-  var styleElement = document.createElement('style')
-  styleElement.type = 'text/css'
-  head.appendChild(styleElement)
-  return styleElement
-}
-
-function addStyle (obj /* StyleObjectPart */) {
-  var update, remove
-  var styleElement = document.querySelector('style[' + ssrIdKey + '~="' + obj.id + '"]')
-
-  if (styleElement) {
-    if (isProduction) {
-      // has SSR styles and in production mode.
-      // simply do nothing.
-      return noop
-    } else {
-      // has SSR styles but in dev mode.
-      // for some reason Chrome can't handle source map in server-rendered
-      // style tags - source maps in <style> only works if the style tag is
-      // created and inserted dynamically. So we remove the server rendered
-      // styles and inject new ones.
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  if (isOldIE) {
-    // use singleton mode for IE9.
-    var styleIndex = singletonCounter++
-    styleElement = singletonElement || (singletonElement = createStyleElement())
-    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
-    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
-  } else {
-    // use multi-style-tag mode in all other cases
-    styleElement = createStyleElement()
-    update = applyToTag.bind(null, styleElement)
-    remove = function () {
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  update(obj)
-
-  return function updateStyle (newObj /* StyleObjectPart */) {
-    if (newObj) {
-      if (newObj.css === obj.css &&
-          newObj.media === obj.media &&
-          newObj.sourceMap === obj.sourceMap) {
-        return
-      }
-      update(obj = newObj)
-    } else {
-      remove()
-    }
-  }
-}
-
-var replaceText = (function () {
-  var textStore = []
-
-  return function (index, replacement) {
-    textStore[index] = replacement
-    return textStore.filter(Boolean).join('\n')
-  }
-})()
-
-function applyToSingletonTag (styleElement, index, remove, obj) {
-  var css = remove ? '' : obj.css
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = replaceText(index, css)
-  } else {
-    var cssNode = document.createTextNode(css)
-    var childNodes = styleElement.childNodes
-    if (childNodes[index]) styleElement.removeChild(childNodes[index])
-    if (childNodes.length) {
-      styleElement.insertBefore(cssNode, childNodes[index])
-    } else {
-      styleElement.appendChild(cssNode)
-    }
-  }
-}
-
-function applyToTag (styleElement, obj) {
-  var css = obj.css
-  var media = obj.media
-  var sourceMap = obj.sourceMap
-
-  if (media) {
-    styleElement.setAttribute('media', media)
-  }
-  if (options.ssrId) {
-    styleElement.setAttribute(ssrIdKey, obj.id)
-  }
-
-  if (sourceMap) {
-    // https://developer.chrome.com/devtools/docs/javascript-debugging
-    // this makes source maps inside style tags work properly in Chrome
-    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
-    // http://stackoverflow.com/a/26603875
-    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
-  }
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = css
-  } else {
-    while (styleElement.firstChild) {
-      styleElement.removeChild(styleElement.firstChild)
-    }
-    styleElement.appendChild(document.createTextNode(css))
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
   }
 }
 
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18334,7 +18100,13 @@ function applyToTag (styleElement, obj) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(27)(module)))
 
 /***/ }),
-/* 12 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(28);
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18352,7 +18124,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18363,7 +18135,7 @@ var settle = __webpack_require__(32);
 var buildURL = __webpack_require__(34);
 var parseHeaders = __webpack_require__(35);
 var isURLSameOrigin = __webpack_require__(36);
-var createError = __webpack_require__(14);
+var createError = __webpack_require__(13);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -18521,7 +18293,7 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18546,7 +18318,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18558,7 +18330,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18584,7 +18356,7 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -18630,7 +18402,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(70);
+var	fixUrls = __webpack_require__(62);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -18943,37 +18715,37 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(19);
-module.exports = __webpack_require__(83);
+__webpack_require__(18);
+module.exports = __webpack_require__(75);
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__js_store__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__VueCsvImport__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue_form_wizard__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__js_store__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__VueCsvImport__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue_form_wizard__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_vue_form_wizard___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_vue_form_wizard__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_vue_form_wizard_dist_vue_form_wizard_min_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_vue_themify_icons__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_vue_themify_icons__ = __webpack_require__(63);
 
-__webpack_require__(8);
+__webpack_require__(6);
 
 
-window.Vue = __webpack_require__(4);
-window.axios = __webpack_require__(6);
-window._ = __webpack_require__(11);
+window.Vue = __webpack_require__(2);
+window.axios = __webpack_require__(10);
+window._ = __webpack_require__(9);
 window.Popper = __webpack_require__(52).default;
 
-Vue.component('vuecsvimport', __webpack_require__(9));
+Vue.component('vuecsvimport', __webpack_require__(7));
 
 
 
@@ -18993,7 +18765,7 @@ var app = new Vue({
 });
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30957,10 +30729,10 @@ Vue.compile = compileToFunctions;
 
 module.exports = Vue;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(21).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(20).setImmediate))
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -31016,7 +30788,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(22);
+__webpack_require__(21);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -31030,7 +30802,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -31220,20 +30992,20 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(24);
+var content = __webpack_require__(23);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(10)("31044b6e", content, false, {});
+var update = __webpack_require__(24)("31044b6e", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -31249,10 +31021,10 @@ if(false) {
 }
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(2)(false);
+exports = module.exports = __webpack_require__(4)(false);
 // imports
 
 
@@ -31260,6 +31032,234 @@ exports = module.exports = __webpack_require__(2)(false);
 exports.push([module.i, "\n#app {\n    font-family: \"Avenir\", Helvetica, Arial, sans-serif;\n    -webkit-font-smoothing: antialiased;\n    -moz-osx-font-smoothing: grayscale;\n    text-align: center;\n    color: #2c3e50;\n    margin-top: 60px;\n}\n.container {\n    text-align: left;\n}\npre code {\n    background-color: #eee;\n    border: 1px solid #999;\n    display: block;\n    padding: 20px;\n}\n#app .form {\n    text-align: left;\n}\n", ""]);
 
 // exports
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+  Modified by Evan You @yyx990803
+*/
+
+var hasDocument = typeof document !== 'undefined'
+
+if (typeof DEBUG !== 'undefined' && DEBUG) {
+  if (!hasDocument) {
+    throw new Error(
+    'vue-style-loader cannot be used in a non-browser environment. ' +
+    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+  ) }
+}
+
+var listToStyles = __webpack_require__(25)
+
+/*
+type StyleObject = {
+  id: number;
+  parts: Array<StyleObjectPart>
+}
+
+type StyleObjectPart = {
+  css: string;
+  media: string;
+  sourceMap: ?string
+}
+*/
+
+var stylesInDom = {/*
+  [id: number]: {
+    id: number,
+    refs: number,
+    parts: Array<(obj?: StyleObjectPart) => void>
+  }
+*/}
+
+var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+var singletonElement = null
+var singletonCounter = 0
+var isProduction = false
+var noop = function () {}
+var options = null
+var ssrIdKey = 'data-vue-ssr-id'
+
+// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+// tags it will allow on a page
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+
+module.exports = function (parentId, list, _isProduction, _options) {
+  isProduction = _isProduction
+
+  options = _options || {}
+
+  var styles = listToStyles(parentId, list)
+  addStylesToDom(styles)
+
+  return function update (newList) {
+    var mayRemove = []
+    for (var i = 0; i < styles.length; i++) {
+      var item = styles[i]
+      var domStyle = stylesInDom[item.id]
+      domStyle.refs--
+      mayRemove.push(domStyle)
+    }
+    if (newList) {
+      styles = listToStyles(parentId, newList)
+      addStylesToDom(styles)
+    } else {
+      styles = []
+    }
+    for (var i = 0; i < mayRemove.length; i++) {
+      var domStyle = mayRemove[i]
+      if (domStyle.refs === 0) {
+        for (var j = 0; j < domStyle.parts.length; j++) {
+          domStyle.parts[j]()
+        }
+        delete stylesInDom[domStyle.id]
+      }
+    }
+  }
+}
+
+function addStylesToDom (styles /* Array<StyleObject> */) {
+  for (var i = 0; i < styles.length; i++) {
+    var item = styles[i]
+    var domStyle = stylesInDom[item.id]
+    if (domStyle) {
+      domStyle.refs++
+      for (var j = 0; j < domStyle.parts.length; j++) {
+        domStyle.parts[j](item.parts[j])
+      }
+      for (; j < item.parts.length; j++) {
+        domStyle.parts.push(addStyle(item.parts[j]))
+      }
+      if (domStyle.parts.length > item.parts.length) {
+        domStyle.parts.length = item.parts.length
+      }
+    } else {
+      var parts = []
+      for (var j = 0; j < item.parts.length; j++) {
+        parts.push(addStyle(item.parts[j]))
+      }
+      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+    }
+  }
+}
+
+function createStyleElement () {
+  var styleElement = document.createElement('style')
+  styleElement.type = 'text/css'
+  head.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj /* StyleObjectPart */) {
+  var update, remove
+  var styleElement = document.querySelector('style[' + ssrIdKey + '~="' + obj.id + '"]')
+
+  if (styleElement) {
+    if (isProduction) {
+      // has SSR styles and in production mode.
+      // simply do nothing.
+      return noop
+    } else {
+      // has SSR styles but in dev mode.
+      // for some reason Chrome can't handle source map in server-rendered
+      // style tags - source maps in <style> only works if the style tag is
+      // created and inserted dynamically. So we remove the server rendered
+      // styles and inject new ones.
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  if (isOldIE) {
+    // use singleton mode for IE9.
+    var styleIndex = singletonCounter++
+    styleElement = singletonElement || (singletonElement = createStyleElement())
+    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+  } else {
+    // use multi-style-tag mode in all other cases
+    styleElement = createStyleElement()
+    update = applyToTag.bind(null, styleElement)
+    remove = function () {
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  update(obj)
+
+  return function updateStyle (newObj /* StyleObjectPart */) {
+    if (newObj) {
+      if (newObj.css === obj.css &&
+          newObj.media === obj.media &&
+          newObj.sourceMap === obj.sourceMap) {
+        return
+      }
+      update(obj = newObj)
+    } else {
+      remove()
+    }
+  }
+}
+
+var replaceText = (function () {
+  var textStore = []
+
+  return function (index, replacement) {
+    textStore[index] = replacement
+    return textStore.filter(Boolean).join('\n')
+  }
+})()
+
+function applyToSingletonTag (styleElement, index, remove, obj) {
+  var css = remove ? '' : obj.css
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = replaceText(index, css)
+  } else {
+    var cssNode = document.createTextNode(css)
+    var childNodes = styleElement.childNodes
+    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+    if (childNodes.length) {
+      styleElement.insertBefore(cssNode, childNodes[index])
+    } else {
+      styleElement.appendChild(cssNode)
+    }
+  }
+}
+
+function applyToTag (styleElement, obj) {
+  var css = obj.css
+  var media = obj.media
+  var sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
+  }
+  if (options.ssrId) {
+    styleElement.setAttribute(ssrIdKey, obj.id)
+  }
+
+  if (sourceMap) {
+    // https://developer.chrome.com/devtools/docs/javascript-debugging
+    // this makes source maps inside style tags work properly in Chrome
+    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+    // http://stackoverflow.com/a/26603875
+    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+  }
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild)
+    }
+    styleElement.appendChild(document.createTextNode(css))
+  }
+}
 
 
 /***/ }),
@@ -31301,9 +31301,9 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_axios__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_axios__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_axios__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_papaparse__ = __webpack_require__(45);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_papaparse___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_papaparse__);
@@ -31536,7 +31536,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             data: null,
             options: [],
             isUsed: {},
-            errors: []
+            errors: [],
+            with_errors: false
 
         };
     },
@@ -31621,6 +31622,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }).catch(function (err) {
                 console.log(err);
             });
+            if (this.errors.length > 0) {
+                console.log("iko na errors");
+            } else {
+                console.log("haina errors");
+            }
         },
         load: function load() {
             var _this5 = this;
@@ -31726,7 +31732,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     } else {
                         this.errors.push("Please make sure you match Full Name and Loan Amount.");
                         this.errors.push("Please make sure you match Full Name");
-                        console.log("Fill all the columns first");
+                        this.with_errors = true;
+                        //console.log("Fill all the columns first")
                     }
                     /*
                      if (hasAllKeys) {
@@ -31758,6 +31765,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return !!vm.isUsed[o];
             });
         },
+
+        with_errors: false,
         showErrorMessage: function showErrorMessage() {
             return this.fileSelected && !this.isValidFileMimeType;
         },
@@ -31803,9 +31812,9 @@ module.exports = function(module) {
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(12);
+var bind = __webpack_require__(11);
 var Axios = __webpack_require__(30);
-var defaults = __webpack_require__(7);
+var defaults = __webpack_require__(5);
 
 /**
  * Create an instance of Axios
@@ -31838,9 +31847,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(16);
+axios.Cancel = __webpack_require__(15);
 axios.CancelToken = __webpack_require__(43);
-axios.isCancel = __webpack_require__(15);
+axios.isCancel = __webpack_require__(14);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -31878,7 +31887,7 @@ module.exports = function isBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(7);
+var defaults = __webpack_require__(5);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(38);
 var dispatchRequest = __webpack_require__(39);
@@ -31983,7 +31992,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(14);
+var createError = __webpack_require__(13);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -32373,8 +32382,8 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(40);
-var isCancel = __webpack_require__(15);
-var defaults = __webpack_require__(7);
+var isCancel = __webpack_require__(14);
+var defaults = __webpack_require__(5);
 var isAbsoluteURL = __webpack_require__(41);
 var combineURLs = __webpack_require__(42);
 
@@ -32533,7 +32542,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(16);
+var Cancel = __webpack_require__(15);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -33164,7 +33173,7 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 50 */
@@ -33175,8 +33184,6 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { attrs: { id: "app" } }, [
-    _c("h4", { staticClass: "mb-4" }, [_vm._v("Upload the CSV File below")]),
-    _vm._v(" "),
     _c(
       "div",
       { staticClass: "form" },
@@ -33196,6 +33203,10 @@ var render = function() {
             }
           },
           [
+            _c("h3", { attrs: { slot: "title" }, slot: "title" }, [
+              _vm._v("Upload the CSV File below")
+            ]),
+            _vm._v(" "),
             _c(
               "tab-content",
               {
@@ -33298,9 +33309,7 @@ var render = function() {
                           _vm._v(_vm._s(_vm.errorMsg))
                         ])
                       ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.errors
+                    : _vm.errors
                     ? _c("div", [
                         _c("p", { staticStyle: { color: "green" } }, [
                           _vm._v(_vm._s(_vm.errors[0]))
@@ -33441,18 +33450,20 @@ var render = function() {
                         ])
                       ])
                     : _c("div", [
-                        _c("p", { staticStyle: { color: "red" } }, [
-                          _vm._v(_vm._s(_vm.errors[1]))
+                        _c("p", { staticStyle: { color: "green" } }, [
+                          _vm._v(_vm._s(_vm.errors[0]))
                         ])
+                      ]),
+                  _vm._v(" "),
+                  _vm.with_errors
+                    ? _c("div", [
+                        _c("p"),
+                        _c("h3", { staticStyle: { color: "green" } }, [
+                          _vm._v("Data successfully loaded!")
+                        ]),
+                        _c("p")
                       ])
-                ]),
-                _vm._v(" "),
-                _c("div", [
-                  _c("p"),
-                  _c("h3", { staticStyle: { color: "green" } }, [
-                    _vm._v("Data successfully loaded!")
-                  ]),
-                  _c("p")
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c(
@@ -39069,25 +39080,17 @@ Popper.Defaults = Defaults;
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__actions__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mutations__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__getters__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__state__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__actions__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mutations__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__getters__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__state__ = __webpack_require__(58);
 
 
 
@@ -39105,7 +39108,7 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
 }));
 
 /***/ }),
-/* 62 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40050,7 +40053,7 @@ var index_esm = {
 
 
 /***/ }),
-/* 63 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40102,7 +40105,7 @@ var actions = {
 /* harmony default export */ __webpack_exports__["a"] = (actions);
 
 /***/ }),
-/* 64 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40125,7 +40128,7 @@ var mutations = {
 /* harmony default export */ __webpack_exports__["a"] = (mutations);
 
 /***/ }),
-/* 65 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40154,7 +40157,7 @@ var getters = {
 /* harmony default export */ __webpack_exports__["a"] = (getters);
 
 /***/ }),
-/* 66 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40169,19 +40172,19 @@ var state = {
 /* harmony default export */ __webpack_exports__["a"] = (state);
 
 /***/ }),
-/* 67 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.VueFormWizard=e():t.VueFormWizard=e()}("undefined"!=typeof self?self:this,function(){return function(t){function e(n){if(a[n])return a[n].exports;var i=a[n]={i:n,l:!1,exports:{}};return t[n].call(i.exports,i,i.exports,e),i.l=!0,i.exports}var a={};return e.m=t,e.c=a,e.d=function(t,a,n){e.o(t,a)||Object.defineProperty(t,a,{configurable:!1,enumerable:!0,get:n})},e.n=function(t){var a=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(a,"a",a),a},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=7)}([function(t,e){t.exports=function(t,e,a,n,i,r){var s,o=t=t||{},c=typeof t.default;"object"!==c&&"function"!==c||(s=t,o=t.default);var u="function"==typeof o?o.options:o;e&&(u.render=e.render,u.staticRenderFns=e.staticRenderFns,u._compiled=!0),a&&(u.functional=!0),i&&(u._scopeId=i);var l;if(r?(l=function(t){t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext,t||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),n&&n.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},u._ssrRegister=l):n&&(l=n),l){var d=u.functional,b=d?u.render:u.beforeCreate;d?(u._injectStyles=l,u.render=function(t,e){return l.call(e),b(t,e)}):u.beforeCreate=b?[].concat(b,l):[l]}return{esModule:s,exports:o,options:u}}},function(t,e,a){"use strict";var n=a(2),i=a(4),r=a(14);e.a={name:"form-wizard",components:{WizardButton:n.a,WizardStep:i.a},props:{title:{type:String,default:"Awesome Wizard"},subtitle:{type:String,default:"Split a complicated flow in multiple steps"},nextButtonText:{type:String,default:"Next"},backButtonText:{type:String,default:"Back"},finishButtonText:{type:String,default:"Finish"},hideButtons:{type:Boolean,default:!1},validateOnBack:Boolean,color:{type:String,default:"#e74c3c"},errorColor:{type:String,default:"#8b0000"},shape:{type:String,default:"circle"},layout:{type:String,default:"horizontal"},stepsClasses:{type:[String,Array],default:""},stepSize:{type:String,default:"md",validator:function(t){return-1!==["xs","sm","md","lg"].indexOf(t)}},transition:{type:String,default:""},startIndex:{type:Number,default:0,validator:function(t){return t>=0}}},provide:function(){return{addTab:this.addTab,removeTab:this.removeTab}},data:function(){return{activeTabIndex:0,currentPercentage:0,maxStep:0,loading:!1,tabs:[]}},computed:{slotProps:function(){return{nextTab:this.nextTab,prevTab:this.prevTab,activeTabIndex:this.activeTabIndex,isLastStep:this.isLastStep,fillButtonStyle:this.fillButtonStyle}},tabCount:function(){return this.tabs.length},isLastStep:function(){return this.activeTabIndex===this.tabCount-1},isVertical:function(){return"vertical"===this.layout},displayPrevButton:function(){return 0!==this.activeTabIndex},stepPercentage:function(){return 1/(2*this.tabCount)*100},progressBarStyle:function(){return{backgroundColor:this.color,width:this.progress+"%",color:this.color}},fillButtonStyle:function(){return{backgroundColor:this.color,borderColor:this.color,color:"white"}},progress:function(){return this.activeTabIndex>0?this.stepPercentage*(2*this.activeTabIndex+1):this.stepPercentage}},methods:{emitTabChange:function(t,e){this.$emit("on-change",t,e),this.$emit("update:startIndex",e)},addTab:function(t){var e=this.$slots.default.indexOf(t.$vnode);t.tabId=""+t.title.replace(/ /g,"")+e,this.tabs.splice(e,0,t),e<this.activeTabIndex+1&&(this.maxStep=e,this.changeTab(this.activeTabIndex+1,e))},removeTab:function(t){var e=this.tabs,a=e.indexOf(t);a>-1&&(a===this.activeTabIndex&&(this.maxStep=this.activeTabIndex-1,this.changeTab(this.activeTabIndex,this.activeTabIndex-1)),a<this.activeTabIndex&&(this.maxStep=this.activeTabIndex-1,this.activeTabIndex=this.activeTabIndex-1,this.emitTabChange(this.activeTabIndex+1,this.activeTabIndex)),e.splice(a,1))},reset:function(){this.maxStep=0,this.tabs.forEach(function(t){t.checked=!1}),this.navigateToTab(0)},activateAll:function(){this.maxStep=this.tabs.length-1,this.tabs.forEach(function(t){t.checked=!0})},navigateToTab:function(t){var e=this,a=t>this.activeTabIndex;if(t<=this.maxStep){var n=function n(){a&&t-e.activeTabIndex>1?(e.changeTab(e.activeTabIndex,e.activeTabIndex+1),e.beforeTabChange(e.activeTabIndex,n)):(e.changeTab(e.activeTabIndex,t),e.afterTabChange(e.activeTabIndex))};a?this.beforeTabChange(this.activeTabIndex,n):(this.setValidationError(null),n())}return t<=this.maxStep},nextTab:function(){var t=this,e=function(){t.activeTabIndex<t.tabCount-1?(t.changeTab(t.activeTabIndex,t.activeTabIndex+1),t.afterTabChange(t.activeTabIndex)):t.$emit("on-complete")};this.beforeTabChange(this.activeTabIndex,e)},prevTab:function(){var t=this,e=function(){t.activeTabIndex>0&&(t.setValidationError(null),t.changeTab(t.activeTabIndex,t.activeTabIndex-1))};this.validateOnBack?this.beforeTabChange(this.activeTabIndex,e):e()},focusNextTab:function(){var t=Object(r.b)(this.tabs);if(-1!==t&&t<this.tabs.length-1){var e=this.tabs[t+1];e.checked&&Object(r.a)(e.tabId)}},focusPrevTab:function(){var t=Object(r.b)(this.tabs);if(-1!==t&&t>0){var e=this.tabs[t-1].tabId;Object(r.a)(e)}},setLoading:function(t){this.loading=t,this.$emit("on-loading",t)},setValidationError:function(t){this.tabs[this.activeTabIndex].validationError=t,this.$emit("on-error",t)},validateBeforeChange:function(t,e){var a=this;if(this.setValidationError(null),Object(r.c)(t))this.setLoading(!0),t.then(function(t){a.setLoading(!1);var n=!0===t;a.executeBeforeChange(n,e)}).catch(function(t){a.setLoading(!1),a.setValidationError(t)});else{var n=!0===t;this.executeBeforeChange(n,e)}},executeBeforeChange:function(t,e){this.$emit("on-validate",t,this.activeTabIndex),t?e():this.tabs[this.activeTabIndex].validationError="error"},beforeTabChange:function(t,e){if(!this.loading){var a=this.tabs[t];if(a&&void 0!==a.beforeChange){var n=a.beforeChange();this.validateBeforeChange(n,e)}else e()}},afterTabChange:function(t){if(!this.loading){var e=this.tabs[t];e&&void 0!==e.afterChange&&e.afterChange()}},changeTab:function(t,e){var a=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],n=this.tabs[t],i=this.tabs[e];return n&&(n.active=!1),i&&(i.active=!0),a&&this.activeTabIndex!==e&&this.emitTabChange(t,e),this.activeTabIndex=e,this.activateTabAndCheckStep(this.activeTabIndex),!0},tryChangeRoute:function(t){this.$router&&t.route&&this.$router.push(t.route)},checkRouteChange:function(t){var e=-1,a=this.tabs.find(function(a,n){var i=a.route===t;return i&&(e=n),i});if(a&&!a.active){var n=e>this.activeTabIndex;this.navigateToTab(e,n)}},deactivateTabs:function(){this.tabs.forEach(function(t){t.active=!1})},activateTab:function(t){this.deactivateTabs();var e=this.tabs[t];e&&(e.active=!0,e.checked=!0,this.tryChangeRoute(e))},activateTabAndCheckStep:function(t){this.activateTab(t),t>this.maxStep&&(this.maxStep=t),this.activeTabIndex=t},initializeTabs:function(){this.tabs.length>0&&0===this.startIndex&&this.activateTab(this.activeTabIndex),this.startIndex<this.tabs.length?this.activateTabAndCheckStep(this.startIndex):window.console.warn("Prop startIndex set to "+this.startIndex+" is greater than the number of tabs - "+this.tabs.length+". Make sure that the starting index is less than the number of tabs registered")}},mounted:function(){this.initializeTabs()},watch:{"$route.path":function(t){this.checkRouteChange(t)}}}},function(t,e,a){"use strict";function n(t){a(10)}var i=a(3),r=a(11),s=a(0),o=n,c=s(i.a,r.a,!1,o,null,null);e.a=c.exports},function(t,e,a){"use strict";e.a={}},function(t,e,a){"use strict";function n(t){a(12)}var i=a(5),r=a(13),s=a(0),o=n,c=s(i.a,r.a,!1,o,null,null);e.a=c.exports},function(t,e,a){"use strict";e.a={name:"wizard-step",props:{tab:{type:Object,default:function(){}},transition:{type:String,default:""},index:{type:Number,default:0}},computed:{iconActiveStyle:function(){return{backgroundColor:this.tab.color}},stepCheckedStyle:function(){return{borderColor:this.tab.color}},errorStyle:function(){return{borderColor:this.tab.errorColor,backgroundColor:this.tab.errorColor}},stepTitleStyle:function(){return{color:this.tab.validationError?this.tab.errorColor:this.tab.color}},isStepSquare:function(){return"square"===this.tab.shape},isTabShape:function(){return"tab"===this.tab.shape}}}},function(t,e,a){"use strict";e.a={name:"tab-content",props:{title:{type:String,default:""},icon:{type:String,default:""},beforeChange:{type:Function},afterChange:{type:Function},route:{type:[String,Object]},additionalInfo:{type:Object,default:function(){}}},inject:["addTab","removeTab"],data:function(){return{active:!1,validationError:null,checked:!1,tabId:""}},computed:{shape:function(){return this.$parent.shape},color:function(){return this.$parent.color},errorColor:function(){return this.$parent.errorColor}},mounted:function(){this.addTab(this)},destroyed:function(){this.$el&&this.$el.parentNode&&this.$el.parentNode.removeChild(this.$el),this.removeTab(this)}}},function(t,e,a){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var n=a(8),i=a(16),r=a(2),s=a(4);a.d(e,"FormWizard",function(){return n.a}),a.d(e,"TabContent",function(){return i.a}),a.d(e,"WizardButton",function(){return r.a}),a.d(e,"WizardStep",function(){return s.a});var o={install:function(t){t.component("form-wizard",n.a),t.component("tab-content",i.a),t.component("wizard-button",r.a),t.component("wizard-step",s.a)}};"undefined"!=typeof window&&window.Vue&&window.Vue.use(o),e.default=o},function(t,e,a){"use strict";function n(t){a(9)}var i=a(1),r=a(15),s=a(0),o=n,c=s(i.a,r.a,!1,o,null,null);e.a=c.exports},function(t,e){},function(t,e){},function(t,e,a){"use strict";var n=function(){var t=this,e=t.$createElement;return(t._self._c||e)("button",{staticClass:"wizard-btn",attrs:{tabindex:"-1",type:"button"}},[t._t("default")],2)},i=[],r={render:n,staticRenderFns:i};e.a=r},function(t,e){},function(t,e,a){"use strict";var n=function(){var t=this,e=t.$createElement,a=t._self._c||e;return a("li",{class:{active:t.tab.active}},[a("a",{class:{disabled:!t.tab.checked},attrs:{href:"javascript:void(0)"}},[a("div",{staticClass:"wizard-icon-circle md",class:{checked:t.tab.checked,square_shape:t.isStepSquare,tab_shape:t.isTabShape},style:[t.tab.checked?t.stepCheckedStyle:{},t.tab.validationError?t.errorStyle:{}],attrs:{role:"tab",tabindex:t.tab.checked?0:"",id:"step-"+t.tab.tabId,"aria-controls":t.tab.tabId,"aria-disabled":t.tab.active,"aria-selected":t.tab.active}},[a("transition",{attrs:{name:t.transition,mode:"out-in"}},[t.tab.active?a("div",{staticClass:"wizard-icon-container",class:{square_shape:t.isStepSquare,tab_shape:t.isTabShape},style:[t.tab.active?t.iconActiveStyle:{},t.tab.validationError?t.errorStyle:{}]},[t._t("active-step",[t.tab.icon?a("i",{staticClass:"wizard-icon",class:t.tab.icon}):a("i",{staticClass:"wizard-icon"},[t._v(t._s(t.index+1))])])],2):t._e(),t._v(" "),t.tab.active?t._e():t._t("default",[!t.tab.active&&t.tab.icon?a("i",{staticClass:"wizard-icon",class:t.tab.icon}):t._e(),t._v(" "),t.tab.active||t.tab.icon?t._e():a("i",{staticClass:"wizard-icon"},[t._v(t._s(t.index+1))])])],2)],1),t._v(" "),t._t("title",[a("span",{staticClass:"stepTitle",class:{active:t.tab.active,has_error:t.tab.validationError},style:t.tab.active?t.stepTitleStyle:{}},[t._v("\n            "+t._s(t.tab.title)+"\n      ")])])],2)])},i=[],r={render:n,staticRenderFns:i};e.a=r},function(t,e,a){"use strict";function n(){return document.activeElement.id}function i(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],e=n();return t.findIndex(function(t){return t.tabId===e})}function r(t){document.getElementById(t).focus()}function s(t){return t.then&&"function"==typeof t.then}e.b=i,e.a=r,e.c=s},function(t,e,a){"use strict";var n=function(){var t=this,e=t.$createElement,a=t._self._c||e;return a("div",{staticClass:"vue-form-wizard",class:[t.stepSize,{vertical:t.isVertical}],on:{keyup:[function(e){return"button"in e||!t._k(e.keyCode,"right",39,e.key)?"button"in e&&2!==e.button?null:void t.focusNextTab(e):null},function(e){return"button"in e||!t._k(e.keyCode,"left",37,e.key)?"button"in e&&0!==e.button?null:void t.focusPrevTab(e):null}]}},[a("div",{staticClass:"wizard-header"},[t._t("title",[a("h4",{staticClass:"wizard-title"},[t._v(t._s(t.title))]),t._v(" "),a("p",{staticClass:"category"},[t._v(t._s(t.subtitle))])])],2),t._v(" "),a("div",{staticClass:"wizard-navigation"},[t.isVertical?t._e():a("div",{staticClass:"wizard-progress-with-circle"},[a("div",{staticClass:"wizard-progress-bar",style:t.progressBarStyle})]),t._v(" "),a("ul",{staticClass:"wizard-nav wizard-nav-pills",class:t.stepsClasses,attrs:{role:"tablist"}},[t._l(t.tabs,function(e,n){return t._t("step",[a("wizard-step",{attrs:{tab:e,"step-size":t.stepSize,transition:t.transition,index:n},nativeOn:{click:function(e){t.navigateToTab(n)},keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13,e.key))return null;t.navigateToTab(n)}}})],{tab:e,index:n,navigateToTab:t.navigateToTab,stepSize:t.stepSize,transition:t.transition})})],2),t._v(" "),a("div",{staticClass:"wizard-tab-content"},[t._t("default",null,null,t.slotProps)],2)]),t._v(" "),t.hideButtons?t._e():a("div",{staticClass:"wizard-card-footer clearfix"},[t._t("footer",[a("div",{staticClass:"wizard-footer-left"},[t.displayPrevButton?a("span",{attrs:{role:"button",tabindex:"0"},on:{click:t.prevTab,keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13,e.key))return null;t.prevTab(e)}}},[t._t("prev",[a("wizard-button",{style:t.fillButtonStyle,attrs:{disabled:t.loading}},[t._v("\n              "+t._s(t.backButtonText)+"\n            ")])],null,t.slotProps)],2):t._e(),t._v(" "),t._t("custom-buttons-left",null,null,t.slotProps)],2),t._v(" "),a("div",{staticClass:"wizard-footer-right"},[t._t("custom-buttons-right",null,null,t.slotProps),t._v(" "),t.isLastStep?a("span",{attrs:{role:"button",tabindex:"0"},on:{click:t.nextTab,keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13,e.key))return null;t.nextTab(e)}}},[t._t("finish",[a("wizard-button",{style:t.fillButtonStyle},[t._v("\n              "+t._s(t.finishButtonText)+"\n            ")])],null,t.slotProps)],2):a("span",{attrs:{role:"button",tabindex:"0"},on:{click:t.nextTab,keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13,e.key))return null;t.nextTab(e)}}},[t._t("next",[a("wizard-button",{style:t.fillButtonStyle,attrs:{disabled:t.loading}},[t._v("\n            "+t._s(t.nextButtonText)+"\n           ")])],null,t.slotProps)],2)],2)],null,t.slotProps)],2)])},i=[],r={render:n,staticRenderFns:i};e.a=r},function(t,e,a){"use strict";var n=a(6),i=a(17),r=a(0),s=r(n.a,i.a,!1,null,null,null);e.a=s.exports},function(t,e,a){"use strict";var n=function(){var t=this,e=t.$createElement;return(t._self._c||e)("div",{directives:[{name:"show",rawName:"v-show",value:t.active,expression:"active"}],staticClass:"wizard-tab-container",attrs:{role:"tabpanel",id:t.tabId,"aria-hidden":!t.active,"aria-labelledby":"step-"+t.tabId}},[t._t("default",null,{active:t.active})],2)},i=[],r={render:n,staticRenderFns:i};e.a=r}])});
 
 /***/ }),
-/* 68 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(69);
+var content = __webpack_require__(61);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -40189,7 +40192,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(17)(content, options);
+var update = __webpack_require__(16)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -40206,10 +40209,10 @@ if(false) {
 }
 
 /***/ }),
-/* 69 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(2)(false);
+exports = module.exports = __webpack_require__(4)(false);
 // imports
 
 
@@ -40220,7 +40223,7 @@ exports.push([module.i, ".vue-form-wizard .wizard-btn{display:inline-block;margi
 
 
 /***/ }),
-/* 70 */
+/* 62 */
 /***/ (function(module, exports) {
 
 
@@ -40315,11 +40318,11 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 71 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ThemifyIcon_vue__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ThemifyIcon_vue__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ThemifyIcon_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__ThemifyIcon_vue__);
 
 
@@ -40327,15 +40330,15 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 72 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(3)
+var normalizeComponent = __webpack_require__(8)
 /* script */
-var __vue_script__ = __webpack_require__(73)
+var __vue_script__ = __webpack_require__(65)
 /* template */
-var __vue_template__ = __webpack_require__(82)
+var __vue_template__ = __webpack_require__(74)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -40374,12 +40377,12 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 73 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__themify_icons_themify_icons_css__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__themify_icons_themify_icons_css__ = __webpack_require__(66);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__themify_icons_themify_icons_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__themify_icons_themify_icons_css__);
 //
 //
@@ -40394,13 +40397,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 74 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(75);
+var content = __webpack_require__(67);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -40408,7 +40411,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(17)(content, options);
+var update = __webpack_require__(16)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -40425,22 +40428,22 @@ if(false) {
 }
 
 /***/ }),
-/* 75 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var escape = __webpack_require__(76);
-exports = module.exports = __webpack_require__(2)(false);
+var escape = __webpack_require__(68);
+exports = module.exports = __webpack_require__(4)(false);
 // imports
 
 
 // module
-exports.push([module.i, "@font-face {\n\tfont-family: 'themify';\n\tsrc:url(" + escape(__webpack_require__(77)) + ");\n\tsrc:url(" + escape(__webpack_require__(78)) + "?#iefix-fvbane) format('embedded-opentype'),\n\t\turl(" + escape(__webpack_require__(79)) + ") format('woff'),\n\t\turl(" + escape(__webpack_require__(80)) + ") format('truetype'),\n\t\turl(" + escape(__webpack_require__(81)) + "#themify) format('svg');\n\tfont-weight: normal;\n\tfont-style: normal;\n}\n\n[class^=\"ti-\"], [class*=\" ti-\"] {\n\tfont-family: 'themify';\n\tspeak: none;\n\tfont-style: normal;\n\tfont-weight: normal;\n\tfont-variant: normal;\n\ttext-transform: none;\n\tline-height: 1;\n\n\t/* Better Font Rendering =========== */\n\t-webkit-font-smoothing: antialiased;\n\t-moz-osx-font-smoothing: grayscale;\n}\n\n.ti-wand:before {\n\tcontent: \"\\E600\";\n}\n.ti-volume:before {\n\tcontent: \"\\E601\";\n}\n.ti-user:before {\n\tcontent: \"\\E602\";\n}\n.ti-unlock:before {\n\tcontent: \"\\E603\";\n}\n.ti-unlink:before {\n\tcontent: \"\\E604\";\n}\n.ti-trash:before {\n\tcontent: \"\\E605\";\n}\n.ti-thought:before {\n\tcontent: \"\\E606\";\n}\n.ti-target:before {\n\tcontent: \"\\E607\";\n}\n.ti-tag:before {\n\tcontent: \"\\E608\";\n}\n.ti-tablet:before {\n\tcontent: \"\\E609\";\n}\n.ti-star:before {\n\tcontent: \"\\E60A\";\n}\n.ti-spray:before {\n\tcontent: \"\\E60B\";\n}\n.ti-signal:before {\n\tcontent: \"\\E60C\";\n}\n.ti-shopping-cart:before {\n\tcontent: \"\\E60D\";\n}\n.ti-shopping-cart-full:before {\n\tcontent: \"\\E60E\";\n}\n.ti-settings:before {\n\tcontent: \"\\E60F\";\n}\n.ti-search:before {\n\tcontent: \"\\E610\";\n}\n.ti-zoom-in:before {\n\tcontent: \"\\E611\";\n}\n.ti-zoom-out:before {\n\tcontent: \"\\E612\";\n}\n.ti-cut:before {\n\tcontent: \"\\E613\";\n}\n.ti-ruler:before {\n\tcontent: \"\\E614\";\n}\n.ti-ruler-pencil:before {\n\tcontent: \"\\E615\";\n}\n.ti-ruler-alt:before {\n\tcontent: \"\\E616\";\n}\n.ti-bookmark:before {\n\tcontent: \"\\E617\";\n}\n.ti-bookmark-alt:before {\n\tcontent: \"\\E618\";\n}\n.ti-reload:before {\n\tcontent: \"\\E619\";\n}\n.ti-plus:before {\n\tcontent: \"\\E61A\";\n}\n.ti-pin:before {\n\tcontent: \"\\E61B\";\n}\n.ti-pencil:before {\n\tcontent: \"\\E61C\";\n}\n.ti-pencil-alt:before {\n\tcontent: \"\\E61D\";\n}\n.ti-paint-roller:before {\n\tcontent: \"\\E61E\";\n}\n.ti-paint-bucket:before {\n\tcontent: \"\\E61F\";\n}\n.ti-na:before {\n\tcontent: \"\\E620\";\n}\n.ti-mobile:before {\n\tcontent: \"\\E621\";\n}\n.ti-minus:before {\n\tcontent: \"\\E622\";\n}\n.ti-medall:before {\n\tcontent: \"\\E623\";\n}\n.ti-medall-alt:before {\n\tcontent: \"\\E624\";\n}\n.ti-marker:before {\n\tcontent: \"\\E625\";\n}\n.ti-marker-alt:before {\n\tcontent: \"\\E626\";\n}\n.ti-arrow-up:before {\n\tcontent: \"\\E627\";\n}\n.ti-arrow-right:before {\n\tcontent: \"\\E628\";\n}\n.ti-arrow-left:before {\n\tcontent: \"\\E629\";\n}\n.ti-arrow-down:before {\n\tcontent: \"\\E62A\";\n}\n.ti-lock:before {\n\tcontent: \"\\E62B\";\n}\n.ti-location-arrow:before {\n\tcontent: \"\\E62C\";\n}\n.ti-link:before {\n\tcontent: \"\\E62D\";\n}\n.ti-layout:before {\n\tcontent: \"\\E62E\";\n}\n.ti-layers:before {\n\tcontent: \"\\E62F\";\n}\n.ti-layers-alt:before {\n\tcontent: \"\\E630\";\n}\n.ti-key:before {\n\tcontent: \"\\E631\";\n}\n.ti-import:before {\n\tcontent: \"\\E632\";\n}\n.ti-image:before {\n\tcontent: \"\\E633\";\n}\n.ti-heart:before {\n\tcontent: \"\\E634\";\n}\n.ti-heart-broken:before {\n\tcontent: \"\\E635\";\n}\n.ti-hand-stop:before {\n\tcontent: \"\\E636\";\n}\n.ti-hand-open:before {\n\tcontent: \"\\E637\";\n}\n.ti-hand-drag:before {\n\tcontent: \"\\E638\";\n}\n.ti-folder:before {\n\tcontent: \"\\E639\";\n}\n.ti-flag:before {\n\tcontent: \"\\E63A\";\n}\n.ti-flag-alt:before {\n\tcontent: \"\\E63B\";\n}\n.ti-flag-alt-2:before {\n\tcontent: \"\\E63C\";\n}\n.ti-eye:before {\n\tcontent: \"\\E63D\";\n}\n.ti-export:before {\n\tcontent: \"\\E63E\";\n}\n.ti-exchange-vertical:before {\n\tcontent: \"\\E63F\";\n}\n.ti-desktop:before {\n\tcontent: \"\\E640\";\n}\n.ti-cup:before {\n\tcontent: \"\\E641\";\n}\n.ti-crown:before {\n\tcontent: \"\\E642\";\n}\n.ti-comments:before {\n\tcontent: \"\\E643\";\n}\n.ti-comment:before {\n\tcontent: \"\\E644\";\n}\n.ti-comment-alt:before {\n\tcontent: \"\\E645\";\n}\n.ti-close:before {\n\tcontent: \"\\E646\";\n}\n.ti-clip:before {\n\tcontent: \"\\E647\";\n}\n.ti-angle-up:before {\n\tcontent: \"\\E648\";\n}\n.ti-angle-right:before {\n\tcontent: \"\\E649\";\n}\n.ti-angle-left:before {\n\tcontent: \"\\E64A\";\n}\n.ti-angle-down:before {\n\tcontent: \"\\E64B\";\n}\n.ti-check:before {\n\tcontent: \"\\E64C\";\n}\n.ti-check-box:before {\n\tcontent: \"\\E64D\";\n}\n.ti-camera:before {\n\tcontent: \"\\E64E\";\n}\n.ti-announcement:before {\n\tcontent: \"\\E64F\";\n}\n.ti-brush:before {\n\tcontent: \"\\E650\";\n}\n.ti-briefcase:before {\n\tcontent: \"\\E651\";\n}\n.ti-bolt:before {\n\tcontent: \"\\E652\";\n}\n.ti-bolt-alt:before {\n\tcontent: \"\\E653\";\n}\n.ti-blackboard:before {\n\tcontent: \"\\E654\";\n}\n.ti-bag:before {\n\tcontent: \"\\E655\";\n}\n.ti-move:before {\n\tcontent: \"\\E656\";\n}\n.ti-arrows-vertical:before {\n\tcontent: \"\\E657\";\n}\n.ti-arrows-horizontal:before {\n\tcontent: \"\\E658\";\n}\n.ti-fullscreen:before {\n\tcontent: \"\\E659\";\n}\n.ti-arrow-top-right:before {\n\tcontent: \"\\E65A\";\n}\n.ti-arrow-top-left:before {\n\tcontent: \"\\E65B\";\n}\n.ti-arrow-circle-up:before {\n\tcontent: \"\\E65C\";\n}\n.ti-arrow-circle-right:before {\n\tcontent: \"\\E65D\";\n}\n.ti-arrow-circle-left:before {\n\tcontent: \"\\E65E\";\n}\n.ti-arrow-circle-down:before {\n\tcontent: \"\\E65F\";\n}\n.ti-angle-double-up:before {\n\tcontent: \"\\E660\";\n}\n.ti-angle-double-right:before {\n\tcontent: \"\\E661\";\n}\n.ti-angle-double-left:before {\n\tcontent: \"\\E662\";\n}\n.ti-angle-double-down:before {\n\tcontent: \"\\E663\";\n}\n.ti-zip:before {\n\tcontent: \"\\E664\";\n}\n.ti-world:before {\n\tcontent: \"\\E665\";\n}\n.ti-wheelchair:before {\n\tcontent: \"\\E666\";\n}\n.ti-view-list:before {\n\tcontent: \"\\E667\";\n}\n.ti-view-list-alt:before {\n\tcontent: \"\\E668\";\n}\n.ti-view-grid:before {\n\tcontent: \"\\E669\";\n}\n.ti-uppercase:before {\n\tcontent: \"\\E66A\";\n}\n.ti-upload:before {\n\tcontent: \"\\E66B\";\n}\n.ti-underline:before {\n\tcontent: \"\\E66C\";\n}\n.ti-truck:before {\n\tcontent: \"\\E66D\";\n}\n.ti-timer:before {\n\tcontent: \"\\E66E\";\n}\n.ti-ticket:before {\n\tcontent: \"\\E66F\";\n}\n.ti-thumb-up:before {\n\tcontent: \"\\E670\";\n}\n.ti-thumb-down:before {\n\tcontent: \"\\E671\";\n}\n.ti-text:before {\n\tcontent: \"\\E672\";\n}\n.ti-stats-up:before {\n\tcontent: \"\\E673\";\n}\n.ti-stats-down:before {\n\tcontent: \"\\E674\";\n}\n.ti-split-v:before {\n\tcontent: \"\\E675\";\n}\n.ti-split-h:before {\n\tcontent: \"\\E676\";\n}\n.ti-smallcap:before {\n\tcontent: \"\\E677\";\n}\n.ti-shine:before {\n\tcontent: \"\\E678\";\n}\n.ti-shift-right:before {\n\tcontent: \"\\E679\";\n}\n.ti-shift-left:before {\n\tcontent: \"\\E67A\";\n}\n.ti-shield:before {\n\tcontent: \"\\E67B\";\n}\n.ti-notepad:before {\n\tcontent: \"\\E67C\";\n}\n.ti-server:before {\n\tcontent: \"\\E67D\";\n}\n.ti-quote-right:before {\n\tcontent: \"\\E67E\";\n}\n.ti-quote-left:before {\n\tcontent: \"\\E67F\";\n}\n.ti-pulse:before {\n\tcontent: \"\\E680\";\n}\n.ti-printer:before {\n\tcontent: \"\\E681\";\n}\n.ti-power-off:before {\n\tcontent: \"\\E682\";\n}\n.ti-plug:before {\n\tcontent: \"\\E683\";\n}\n.ti-pie-chart:before {\n\tcontent: \"\\E684\";\n}\n.ti-paragraph:before {\n\tcontent: \"\\E685\";\n}\n.ti-panel:before {\n\tcontent: \"\\E686\";\n}\n.ti-package:before {\n\tcontent: \"\\E687\";\n}\n.ti-music:before {\n\tcontent: \"\\E688\";\n}\n.ti-music-alt:before {\n\tcontent: \"\\E689\";\n}\n.ti-mouse:before {\n\tcontent: \"\\E68A\";\n}\n.ti-mouse-alt:before {\n\tcontent: \"\\E68B\";\n}\n.ti-money:before {\n\tcontent: \"\\E68C\";\n}\n.ti-microphone:before {\n\tcontent: \"\\E68D\";\n}\n.ti-menu:before {\n\tcontent: \"\\E68E\";\n}\n.ti-menu-alt:before {\n\tcontent: \"\\E68F\";\n}\n.ti-map:before {\n\tcontent: \"\\E690\";\n}\n.ti-map-alt:before {\n\tcontent: \"\\E691\";\n}\n.ti-loop:before {\n\tcontent: \"\\E692\";\n}\n.ti-location-pin:before {\n\tcontent: \"\\E693\";\n}\n.ti-list:before {\n\tcontent: \"\\E694\";\n}\n.ti-light-bulb:before {\n\tcontent: \"\\E695\";\n}\n.ti-Italic:before {\n\tcontent: \"\\E696\";\n}\n.ti-info:before {\n\tcontent: \"\\E697\";\n}\n.ti-infinite:before {\n\tcontent: \"\\E698\";\n}\n.ti-id-badge:before {\n\tcontent: \"\\E699\";\n}\n.ti-hummer:before {\n\tcontent: \"\\E69A\";\n}\n.ti-home:before {\n\tcontent: \"\\E69B\";\n}\n.ti-help:before {\n\tcontent: \"\\E69C\";\n}\n.ti-headphone:before {\n\tcontent: \"\\E69D\";\n}\n.ti-harddrives:before {\n\tcontent: \"\\E69E\";\n}\n.ti-harddrive:before {\n\tcontent: \"\\E69F\";\n}\n.ti-gift:before {\n\tcontent: \"\\E6A0\";\n}\n.ti-game:before {\n\tcontent: \"\\E6A1\";\n}\n.ti-filter:before {\n\tcontent: \"\\E6A2\";\n}\n.ti-files:before {\n\tcontent: \"\\E6A3\";\n}\n.ti-file:before {\n\tcontent: \"\\E6A4\";\n}\n.ti-eraser:before {\n\tcontent: \"\\E6A5\";\n}\n.ti-envelope:before {\n\tcontent: \"\\E6A6\";\n}\n.ti-download:before {\n\tcontent: \"\\E6A7\";\n}\n.ti-direction:before {\n\tcontent: \"\\E6A8\";\n}\n.ti-direction-alt:before {\n\tcontent: \"\\E6A9\";\n}\n.ti-dashboard:before {\n\tcontent: \"\\E6AA\";\n}\n.ti-control-stop:before {\n\tcontent: \"\\E6AB\";\n}\n.ti-control-shuffle:before {\n\tcontent: \"\\E6AC\";\n}\n.ti-control-play:before {\n\tcontent: \"\\E6AD\";\n}\n.ti-control-pause:before {\n\tcontent: \"\\E6AE\";\n}\n.ti-control-forward:before {\n\tcontent: \"\\E6AF\";\n}\n.ti-control-backward:before {\n\tcontent: \"\\E6B0\";\n}\n.ti-cloud:before {\n\tcontent: \"\\E6B1\";\n}\n.ti-cloud-up:before {\n\tcontent: \"\\E6B2\";\n}\n.ti-cloud-down:before {\n\tcontent: \"\\E6B3\";\n}\n.ti-clipboard:before {\n\tcontent: \"\\E6B4\";\n}\n.ti-car:before {\n\tcontent: \"\\E6B5\";\n}\n.ti-calendar:before {\n\tcontent: \"\\E6B6\";\n}\n.ti-book:before {\n\tcontent: \"\\E6B7\";\n}\n.ti-bell:before {\n\tcontent: \"\\E6B8\";\n}\n.ti-basketball:before {\n\tcontent: \"\\E6B9\";\n}\n.ti-bar-chart:before {\n\tcontent: \"\\E6BA\";\n}\n.ti-bar-chart-alt:before {\n\tcontent: \"\\E6BB\";\n}\n.ti-back-right:before {\n\tcontent: \"\\E6BC\";\n}\n.ti-back-left:before {\n\tcontent: \"\\E6BD\";\n}\n.ti-arrows-corner:before {\n\tcontent: \"\\E6BE\";\n}\n.ti-archive:before {\n\tcontent: \"\\E6BF\";\n}\n.ti-anchor:before {\n\tcontent: \"\\E6C0\";\n}\n.ti-align-right:before {\n\tcontent: \"\\E6C1\";\n}\n.ti-align-left:before {\n\tcontent: \"\\E6C2\";\n}\n.ti-align-justify:before {\n\tcontent: \"\\E6C3\";\n}\n.ti-align-center:before {\n\tcontent: \"\\E6C4\";\n}\n.ti-alert:before {\n\tcontent: \"\\E6C5\";\n}\n.ti-alarm-clock:before {\n\tcontent: \"\\E6C6\";\n}\n.ti-agenda:before {\n\tcontent: \"\\E6C7\";\n}\n.ti-write:before {\n\tcontent: \"\\E6C8\";\n}\n.ti-window:before {\n\tcontent: \"\\E6C9\";\n}\n.ti-widgetized:before {\n\tcontent: \"\\E6CA\";\n}\n.ti-widget:before {\n\tcontent: \"\\E6CB\";\n}\n.ti-widget-alt:before {\n\tcontent: \"\\E6CC\";\n}\n.ti-wallet:before {\n\tcontent: \"\\E6CD\";\n}\n.ti-video-clapper:before {\n\tcontent: \"\\E6CE\";\n}\n.ti-video-camera:before {\n\tcontent: \"\\E6CF\";\n}\n.ti-vector:before {\n\tcontent: \"\\E6D0\";\n}\n.ti-themify-logo:before {\n\tcontent: \"\\E6D1\";\n}\n.ti-themify-favicon:before {\n\tcontent: \"\\E6D2\";\n}\n.ti-themify-favicon-alt:before {\n\tcontent: \"\\E6D3\";\n}\n.ti-support:before {\n\tcontent: \"\\E6D4\";\n}\n.ti-stamp:before {\n\tcontent: \"\\E6D5\";\n}\n.ti-split-v-alt:before {\n\tcontent: \"\\E6D6\";\n}\n.ti-slice:before {\n\tcontent: \"\\E6D7\";\n}\n.ti-shortcode:before {\n\tcontent: \"\\E6D8\";\n}\n.ti-shift-right-alt:before {\n\tcontent: \"\\E6D9\";\n}\n.ti-shift-left-alt:before {\n\tcontent: \"\\E6DA\";\n}\n.ti-ruler-alt-2:before {\n\tcontent: \"\\E6DB\";\n}\n.ti-receipt:before {\n\tcontent: \"\\E6DC\";\n}\n.ti-pin2:before {\n\tcontent: \"\\E6DD\";\n}\n.ti-pin-alt:before {\n\tcontent: \"\\E6DE\";\n}\n.ti-pencil-alt2:before {\n\tcontent: \"\\E6DF\";\n}\n.ti-palette:before {\n\tcontent: \"\\E6E0\";\n}\n.ti-more:before {\n\tcontent: \"\\E6E1\";\n}\n.ti-more-alt:before {\n\tcontent: \"\\E6E2\";\n}\n.ti-microphone-alt:before {\n\tcontent: \"\\E6E3\";\n}\n.ti-magnet:before {\n\tcontent: \"\\E6E4\";\n}\n.ti-line-double:before {\n\tcontent: \"\\E6E5\";\n}\n.ti-line-dotted:before {\n\tcontent: \"\\E6E6\";\n}\n.ti-line-dashed:before {\n\tcontent: \"\\E6E7\";\n}\n.ti-layout-width-full:before {\n\tcontent: \"\\E6E8\";\n}\n.ti-layout-width-default:before {\n\tcontent: \"\\E6E9\";\n}\n.ti-layout-width-default-alt:before {\n\tcontent: \"\\E6EA\";\n}\n.ti-layout-tab:before {\n\tcontent: \"\\E6EB\";\n}\n.ti-layout-tab-window:before {\n\tcontent: \"\\E6EC\";\n}\n.ti-layout-tab-v:before {\n\tcontent: \"\\E6ED\";\n}\n.ti-layout-tab-min:before {\n\tcontent: \"\\E6EE\";\n}\n.ti-layout-slider:before {\n\tcontent: \"\\E6EF\";\n}\n.ti-layout-slider-alt:before {\n\tcontent: \"\\E6F0\";\n}\n.ti-layout-sidebar-right:before {\n\tcontent: \"\\E6F1\";\n}\n.ti-layout-sidebar-none:before {\n\tcontent: \"\\E6F2\";\n}\n.ti-layout-sidebar-left:before {\n\tcontent: \"\\E6F3\";\n}\n.ti-layout-placeholder:before {\n\tcontent: \"\\E6F4\";\n}\n.ti-layout-menu:before {\n\tcontent: \"\\E6F5\";\n}\n.ti-layout-menu-v:before {\n\tcontent: \"\\E6F6\";\n}\n.ti-layout-menu-separated:before {\n\tcontent: \"\\E6F7\";\n}\n.ti-layout-menu-full:before {\n\tcontent: \"\\E6F8\";\n}\n.ti-layout-media-right-alt:before {\n\tcontent: \"\\E6F9\";\n}\n.ti-layout-media-right:before {\n\tcontent: \"\\E6FA\";\n}\n.ti-layout-media-overlay:before {\n\tcontent: \"\\E6FB\";\n}\n.ti-layout-media-overlay-alt:before {\n\tcontent: \"\\E6FC\";\n}\n.ti-layout-media-overlay-alt-2:before {\n\tcontent: \"\\E6FD\";\n}\n.ti-layout-media-left-alt:before {\n\tcontent: \"\\E6FE\";\n}\n.ti-layout-media-left:before {\n\tcontent: \"\\E6FF\";\n}\n.ti-layout-media-center-alt:before {\n\tcontent: \"\\E700\";\n}\n.ti-layout-media-center:before {\n\tcontent: \"\\E701\";\n}\n.ti-layout-list-thumb:before {\n\tcontent: \"\\E702\";\n}\n.ti-layout-list-thumb-alt:before {\n\tcontent: \"\\E703\";\n}\n.ti-layout-list-post:before {\n\tcontent: \"\\E704\";\n}\n.ti-layout-list-large-image:before {\n\tcontent: \"\\E705\";\n}\n.ti-layout-line-solid:before {\n\tcontent: \"\\E706\";\n}\n.ti-layout-grid4:before {\n\tcontent: \"\\E707\";\n}\n.ti-layout-grid3:before {\n\tcontent: \"\\E708\";\n}\n.ti-layout-grid2:before {\n\tcontent: \"\\E709\";\n}\n.ti-layout-grid2-thumb:before {\n\tcontent: \"\\E70A\";\n}\n.ti-layout-cta-right:before {\n\tcontent: \"\\E70B\";\n}\n.ti-layout-cta-left:before {\n\tcontent: \"\\E70C\";\n}\n.ti-layout-cta-center:before {\n\tcontent: \"\\E70D\";\n}\n.ti-layout-cta-btn-right:before {\n\tcontent: \"\\E70E\";\n}\n.ti-layout-cta-btn-left:before {\n\tcontent: \"\\E70F\";\n}\n.ti-layout-column4:before {\n\tcontent: \"\\E710\";\n}\n.ti-layout-column3:before {\n\tcontent: \"\\E711\";\n}\n.ti-layout-column2:before {\n\tcontent: \"\\E712\";\n}\n.ti-layout-accordion-separated:before {\n\tcontent: \"\\E713\";\n}\n.ti-layout-accordion-merged:before {\n\tcontent: \"\\E714\";\n}\n.ti-layout-accordion-list:before {\n\tcontent: \"\\E715\";\n}\n.ti-ink-pen:before {\n\tcontent: \"\\E716\";\n}\n.ti-info-alt:before {\n\tcontent: \"\\E717\";\n}\n.ti-help-alt:before {\n\tcontent: \"\\E718\";\n}\n.ti-headphone-alt:before {\n\tcontent: \"\\E719\";\n}\n.ti-hand-point-up:before {\n\tcontent: \"\\E71A\";\n}\n.ti-hand-point-right:before {\n\tcontent: \"\\E71B\";\n}\n.ti-hand-point-left:before {\n\tcontent: \"\\E71C\";\n}\n.ti-hand-point-down:before {\n\tcontent: \"\\E71D\";\n}\n.ti-gallery:before {\n\tcontent: \"\\E71E\";\n}\n.ti-face-smile:before {\n\tcontent: \"\\E71F\";\n}\n.ti-face-sad:before {\n\tcontent: \"\\E720\";\n}\n.ti-credit-card:before {\n\tcontent: \"\\E721\";\n}\n.ti-control-skip-forward:before {\n\tcontent: \"\\E722\";\n}\n.ti-control-skip-backward:before {\n\tcontent: \"\\E723\";\n}\n.ti-control-record:before {\n\tcontent: \"\\E724\";\n}\n.ti-control-eject:before {\n\tcontent: \"\\E725\";\n}\n.ti-comments-smiley:before {\n\tcontent: \"\\E726\";\n}\n.ti-brush-alt:before {\n\tcontent: \"\\E727\";\n}\n.ti-youtube:before {\n\tcontent: \"\\E728\";\n}\n.ti-vimeo:before {\n\tcontent: \"\\E729\";\n}\n.ti-twitter:before {\n\tcontent: \"\\E72A\";\n}\n.ti-time:before {\n\tcontent: \"\\E72B\";\n}\n.ti-tumblr:before {\n\tcontent: \"\\E72C\";\n}\n.ti-skype:before {\n\tcontent: \"\\E72D\";\n}\n.ti-share:before {\n\tcontent: \"\\E72E\";\n}\n.ti-share-alt:before {\n\tcontent: \"\\E72F\";\n}\n.ti-rocket:before {\n\tcontent: \"\\E730\";\n}\n.ti-pinterest:before {\n\tcontent: \"\\E731\";\n}\n.ti-new-window:before {\n\tcontent: \"\\E732\";\n}\n.ti-microsoft:before {\n\tcontent: \"\\E733\";\n}\n.ti-list-ol:before {\n\tcontent: \"\\E734\";\n}\n.ti-linkedin:before {\n\tcontent: \"\\E735\";\n}\n.ti-layout-sidebar-2:before {\n\tcontent: \"\\E736\";\n}\n.ti-layout-grid4-alt:before {\n\tcontent: \"\\E737\";\n}\n.ti-layout-grid3-alt:before {\n\tcontent: \"\\E738\";\n}\n.ti-layout-grid2-alt:before {\n\tcontent: \"\\E739\";\n}\n.ti-layout-column4-alt:before {\n\tcontent: \"\\E73A\";\n}\n.ti-layout-column3-alt:before {\n\tcontent: \"\\E73B\";\n}\n.ti-layout-column2-alt:before {\n\tcontent: \"\\E73C\";\n}\n.ti-instagram:before {\n\tcontent: \"\\E73D\";\n}\n.ti-google:before {\n\tcontent: \"\\E73E\";\n}\n.ti-github:before {\n\tcontent: \"\\E73F\";\n}\n.ti-flickr:before {\n\tcontent: \"\\E740\";\n}\n.ti-facebook:before {\n\tcontent: \"\\E741\";\n}\n.ti-dropbox:before {\n\tcontent: \"\\E742\";\n}\n.ti-dribbble:before {\n\tcontent: \"\\E743\";\n}\n.ti-apple:before {\n\tcontent: \"\\E744\";\n}\n.ti-android:before {\n\tcontent: \"\\E745\";\n}\n.ti-save:before {\n\tcontent: \"\\E746\";\n}\n.ti-save-alt:before {\n\tcontent: \"\\E747\";\n}\n.ti-yahoo:before {\n\tcontent: \"\\E748\";\n}\n.ti-wordpress:before {\n\tcontent: \"\\E749\";\n}\n.ti-vimeo-alt:before {\n\tcontent: \"\\E74A\";\n}\n.ti-twitter-alt:before {\n\tcontent: \"\\E74B\";\n}\n.ti-tumblr-alt:before {\n\tcontent: \"\\E74C\";\n}\n.ti-trello:before {\n\tcontent: \"\\E74D\";\n}\n.ti-stack-overflow:before {\n\tcontent: \"\\E74E\";\n}\n.ti-soundcloud:before {\n\tcontent: \"\\E74F\";\n}\n.ti-sharethis:before {\n\tcontent: \"\\E750\";\n}\n.ti-sharethis-alt:before {\n\tcontent: \"\\E751\";\n}\n.ti-reddit:before {\n\tcontent: \"\\E752\";\n}\n.ti-pinterest-alt:before {\n\tcontent: \"\\E753\";\n}\n.ti-microsoft-alt:before {\n\tcontent: \"\\E754\";\n}\n.ti-linux:before {\n\tcontent: \"\\E755\";\n}\n.ti-jsfiddle:before {\n\tcontent: \"\\E756\";\n}\n.ti-joomla:before {\n\tcontent: \"\\E757\";\n}\n.ti-html5:before {\n\tcontent: \"\\E758\";\n}\n.ti-flickr-alt:before {\n\tcontent: \"\\E759\";\n}\n.ti-email:before {\n\tcontent: \"\\E75A\";\n}\n.ti-drupal:before {\n\tcontent: \"\\E75B\";\n}\n.ti-dropbox-alt:before {\n\tcontent: \"\\E75C\";\n}\n.ti-css3:before {\n\tcontent: \"\\E75D\";\n}\n.ti-rss:before {\n\tcontent: \"\\E75E\";\n}\n.ti-rss-alt:before {\n\tcontent: \"\\E75F\";\n}\n", ""]);
+exports.push([module.i, "@font-face {\n\tfont-family: 'themify';\n\tsrc:url(" + escape(__webpack_require__(69)) + ");\n\tsrc:url(" + escape(__webpack_require__(70)) + "?#iefix-fvbane) format('embedded-opentype'),\n\t\turl(" + escape(__webpack_require__(71)) + ") format('woff'),\n\t\turl(" + escape(__webpack_require__(72)) + ") format('truetype'),\n\t\turl(" + escape(__webpack_require__(73)) + "#themify) format('svg');\n\tfont-weight: normal;\n\tfont-style: normal;\n}\n\n[class^=\"ti-\"], [class*=\" ti-\"] {\n\tfont-family: 'themify';\n\tspeak: none;\n\tfont-style: normal;\n\tfont-weight: normal;\n\tfont-variant: normal;\n\ttext-transform: none;\n\tline-height: 1;\n\n\t/* Better Font Rendering =========== */\n\t-webkit-font-smoothing: antialiased;\n\t-moz-osx-font-smoothing: grayscale;\n}\n\n.ti-wand:before {\n\tcontent: \"\\E600\";\n}\n.ti-volume:before {\n\tcontent: \"\\E601\";\n}\n.ti-user:before {\n\tcontent: \"\\E602\";\n}\n.ti-unlock:before {\n\tcontent: \"\\E603\";\n}\n.ti-unlink:before {\n\tcontent: \"\\E604\";\n}\n.ti-trash:before {\n\tcontent: \"\\E605\";\n}\n.ti-thought:before {\n\tcontent: \"\\E606\";\n}\n.ti-target:before {\n\tcontent: \"\\E607\";\n}\n.ti-tag:before {\n\tcontent: \"\\E608\";\n}\n.ti-tablet:before {\n\tcontent: \"\\E609\";\n}\n.ti-star:before {\n\tcontent: \"\\E60A\";\n}\n.ti-spray:before {\n\tcontent: \"\\E60B\";\n}\n.ti-signal:before {\n\tcontent: \"\\E60C\";\n}\n.ti-shopping-cart:before {\n\tcontent: \"\\E60D\";\n}\n.ti-shopping-cart-full:before {\n\tcontent: \"\\E60E\";\n}\n.ti-settings:before {\n\tcontent: \"\\E60F\";\n}\n.ti-search:before {\n\tcontent: \"\\E610\";\n}\n.ti-zoom-in:before {\n\tcontent: \"\\E611\";\n}\n.ti-zoom-out:before {\n\tcontent: \"\\E612\";\n}\n.ti-cut:before {\n\tcontent: \"\\E613\";\n}\n.ti-ruler:before {\n\tcontent: \"\\E614\";\n}\n.ti-ruler-pencil:before {\n\tcontent: \"\\E615\";\n}\n.ti-ruler-alt:before {\n\tcontent: \"\\E616\";\n}\n.ti-bookmark:before {\n\tcontent: \"\\E617\";\n}\n.ti-bookmark-alt:before {\n\tcontent: \"\\E618\";\n}\n.ti-reload:before {\n\tcontent: \"\\E619\";\n}\n.ti-plus:before {\n\tcontent: \"\\E61A\";\n}\n.ti-pin:before {\n\tcontent: \"\\E61B\";\n}\n.ti-pencil:before {\n\tcontent: \"\\E61C\";\n}\n.ti-pencil-alt:before {\n\tcontent: \"\\E61D\";\n}\n.ti-paint-roller:before {\n\tcontent: \"\\E61E\";\n}\n.ti-paint-bucket:before {\n\tcontent: \"\\E61F\";\n}\n.ti-na:before {\n\tcontent: \"\\E620\";\n}\n.ti-mobile:before {\n\tcontent: \"\\E621\";\n}\n.ti-minus:before {\n\tcontent: \"\\E622\";\n}\n.ti-medall:before {\n\tcontent: \"\\E623\";\n}\n.ti-medall-alt:before {\n\tcontent: \"\\E624\";\n}\n.ti-marker:before {\n\tcontent: \"\\E625\";\n}\n.ti-marker-alt:before {\n\tcontent: \"\\E626\";\n}\n.ti-arrow-up:before {\n\tcontent: \"\\E627\";\n}\n.ti-arrow-right:before {\n\tcontent: \"\\E628\";\n}\n.ti-arrow-left:before {\n\tcontent: \"\\E629\";\n}\n.ti-arrow-down:before {\n\tcontent: \"\\E62A\";\n}\n.ti-lock:before {\n\tcontent: \"\\E62B\";\n}\n.ti-location-arrow:before {\n\tcontent: \"\\E62C\";\n}\n.ti-link:before {\n\tcontent: \"\\E62D\";\n}\n.ti-layout:before {\n\tcontent: \"\\E62E\";\n}\n.ti-layers:before {\n\tcontent: \"\\E62F\";\n}\n.ti-layers-alt:before {\n\tcontent: \"\\E630\";\n}\n.ti-key:before {\n\tcontent: \"\\E631\";\n}\n.ti-import:before {\n\tcontent: \"\\E632\";\n}\n.ti-image:before {\n\tcontent: \"\\E633\";\n}\n.ti-heart:before {\n\tcontent: \"\\E634\";\n}\n.ti-heart-broken:before {\n\tcontent: \"\\E635\";\n}\n.ti-hand-stop:before {\n\tcontent: \"\\E636\";\n}\n.ti-hand-open:before {\n\tcontent: \"\\E637\";\n}\n.ti-hand-drag:before {\n\tcontent: \"\\E638\";\n}\n.ti-folder:before {\n\tcontent: \"\\E639\";\n}\n.ti-flag:before {\n\tcontent: \"\\E63A\";\n}\n.ti-flag-alt:before {\n\tcontent: \"\\E63B\";\n}\n.ti-flag-alt-2:before {\n\tcontent: \"\\E63C\";\n}\n.ti-eye:before {\n\tcontent: \"\\E63D\";\n}\n.ti-export:before {\n\tcontent: \"\\E63E\";\n}\n.ti-exchange-vertical:before {\n\tcontent: \"\\E63F\";\n}\n.ti-desktop:before {\n\tcontent: \"\\E640\";\n}\n.ti-cup:before {\n\tcontent: \"\\E641\";\n}\n.ti-crown:before {\n\tcontent: \"\\E642\";\n}\n.ti-comments:before {\n\tcontent: \"\\E643\";\n}\n.ti-comment:before {\n\tcontent: \"\\E644\";\n}\n.ti-comment-alt:before {\n\tcontent: \"\\E645\";\n}\n.ti-close:before {\n\tcontent: \"\\E646\";\n}\n.ti-clip:before {\n\tcontent: \"\\E647\";\n}\n.ti-angle-up:before {\n\tcontent: \"\\E648\";\n}\n.ti-angle-right:before {\n\tcontent: \"\\E649\";\n}\n.ti-angle-left:before {\n\tcontent: \"\\E64A\";\n}\n.ti-angle-down:before {\n\tcontent: \"\\E64B\";\n}\n.ti-check:before {\n\tcontent: \"\\E64C\";\n}\n.ti-check-box:before {\n\tcontent: \"\\E64D\";\n}\n.ti-camera:before {\n\tcontent: \"\\E64E\";\n}\n.ti-announcement:before {\n\tcontent: \"\\E64F\";\n}\n.ti-brush:before {\n\tcontent: \"\\E650\";\n}\n.ti-briefcase:before {\n\tcontent: \"\\E651\";\n}\n.ti-bolt:before {\n\tcontent: \"\\E652\";\n}\n.ti-bolt-alt:before {\n\tcontent: \"\\E653\";\n}\n.ti-blackboard:before {\n\tcontent: \"\\E654\";\n}\n.ti-bag:before {\n\tcontent: \"\\E655\";\n}\n.ti-move:before {\n\tcontent: \"\\E656\";\n}\n.ti-arrows-vertical:before {\n\tcontent: \"\\E657\";\n}\n.ti-arrows-horizontal:before {\n\tcontent: \"\\E658\";\n}\n.ti-fullscreen:before {\n\tcontent: \"\\E659\";\n}\n.ti-arrow-top-right:before {\n\tcontent: \"\\E65A\";\n}\n.ti-arrow-top-left:before {\n\tcontent: \"\\E65B\";\n}\n.ti-arrow-circle-up:before {\n\tcontent: \"\\E65C\";\n}\n.ti-arrow-circle-right:before {\n\tcontent: \"\\E65D\";\n}\n.ti-arrow-circle-left:before {\n\tcontent: \"\\E65E\";\n}\n.ti-arrow-circle-down:before {\n\tcontent: \"\\E65F\";\n}\n.ti-angle-double-up:before {\n\tcontent: \"\\E660\";\n}\n.ti-angle-double-right:before {\n\tcontent: \"\\E661\";\n}\n.ti-angle-double-left:before {\n\tcontent: \"\\E662\";\n}\n.ti-angle-double-down:before {\n\tcontent: \"\\E663\";\n}\n.ti-zip:before {\n\tcontent: \"\\E664\";\n}\n.ti-world:before {\n\tcontent: \"\\E665\";\n}\n.ti-wheelchair:before {\n\tcontent: \"\\E666\";\n}\n.ti-view-list:before {\n\tcontent: \"\\E667\";\n}\n.ti-view-list-alt:before {\n\tcontent: \"\\E668\";\n}\n.ti-view-grid:before {\n\tcontent: \"\\E669\";\n}\n.ti-uppercase:before {\n\tcontent: \"\\E66A\";\n}\n.ti-upload:before {\n\tcontent: \"\\E66B\";\n}\n.ti-underline:before {\n\tcontent: \"\\E66C\";\n}\n.ti-truck:before {\n\tcontent: \"\\E66D\";\n}\n.ti-timer:before {\n\tcontent: \"\\E66E\";\n}\n.ti-ticket:before {\n\tcontent: \"\\E66F\";\n}\n.ti-thumb-up:before {\n\tcontent: \"\\E670\";\n}\n.ti-thumb-down:before {\n\tcontent: \"\\E671\";\n}\n.ti-text:before {\n\tcontent: \"\\E672\";\n}\n.ti-stats-up:before {\n\tcontent: \"\\E673\";\n}\n.ti-stats-down:before {\n\tcontent: \"\\E674\";\n}\n.ti-split-v:before {\n\tcontent: \"\\E675\";\n}\n.ti-split-h:before {\n\tcontent: \"\\E676\";\n}\n.ti-smallcap:before {\n\tcontent: \"\\E677\";\n}\n.ti-shine:before {\n\tcontent: \"\\E678\";\n}\n.ti-shift-right:before {\n\tcontent: \"\\E679\";\n}\n.ti-shift-left:before {\n\tcontent: \"\\E67A\";\n}\n.ti-shield:before {\n\tcontent: \"\\E67B\";\n}\n.ti-notepad:before {\n\tcontent: \"\\E67C\";\n}\n.ti-server:before {\n\tcontent: \"\\E67D\";\n}\n.ti-quote-right:before {\n\tcontent: \"\\E67E\";\n}\n.ti-quote-left:before {\n\tcontent: \"\\E67F\";\n}\n.ti-pulse:before {\n\tcontent: \"\\E680\";\n}\n.ti-printer:before {\n\tcontent: \"\\E681\";\n}\n.ti-power-off:before {\n\tcontent: \"\\E682\";\n}\n.ti-plug:before {\n\tcontent: \"\\E683\";\n}\n.ti-pie-chart:before {\n\tcontent: \"\\E684\";\n}\n.ti-paragraph:before {\n\tcontent: \"\\E685\";\n}\n.ti-panel:before {\n\tcontent: \"\\E686\";\n}\n.ti-package:before {\n\tcontent: \"\\E687\";\n}\n.ti-music:before {\n\tcontent: \"\\E688\";\n}\n.ti-music-alt:before {\n\tcontent: \"\\E689\";\n}\n.ti-mouse:before {\n\tcontent: \"\\E68A\";\n}\n.ti-mouse-alt:before {\n\tcontent: \"\\E68B\";\n}\n.ti-money:before {\n\tcontent: \"\\E68C\";\n}\n.ti-microphone:before {\n\tcontent: \"\\E68D\";\n}\n.ti-menu:before {\n\tcontent: \"\\E68E\";\n}\n.ti-menu-alt:before {\n\tcontent: \"\\E68F\";\n}\n.ti-map:before {\n\tcontent: \"\\E690\";\n}\n.ti-map-alt:before {\n\tcontent: \"\\E691\";\n}\n.ti-loop:before {\n\tcontent: \"\\E692\";\n}\n.ti-location-pin:before {\n\tcontent: \"\\E693\";\n}\n.ti-list:before {\n\tcontent: \"\\E694\";\n}\n.ti-light-bulb:before {\n\tcontent: \"\\E695\";\n}\n.ti-Italic:before {\n\tcontent: \"\\E696\";\n}\n.ti-info:before {\n\tcontent: \"\\E697\";\n}\n.ti-infinite:before {\n\tcontent: \"\\E698\";\n}\n.ti-id-badge:before {\n\tcontent: \"\\E699\";\n}\n.ti-hummer:before {\n\tcontent: \"\\E69A\";\n}\n.ti-home:before {\n\tcontent: \"\\E69B\";\n}\n.ti-help:before {\n\tcontent: \"\\E69C\";\n}\n.ti-headphone:before {\n\tcontent: \"\\E69D\";\n}\n.ti-harddrives:before {\n\tcontent: \"\\E69E\";\n}\n.ti-harddrive:before {\n\tcontent: \"\\E69F\";\n}\n.ti-gift:before {\n\tcontent: \"\\E6A0\";\n}\n.ti-game:before {\n\tcontent: \"\\E6A1\";\n}\n.ti-filter:before {\n\tcontent: \"\\E6A2\";\n}\n.ti-files:before {\n\tcontent: \"\\E6A3\";\n}\n.ti-file:before {\n\tcontent: \"\\E6A4\";\n}\n.ti-eraser:before {\n\tcontent: \"\\E6A5\";\n}\n.ti-envelope:before {\n\tcontent: \"\\E6A6\";\n}\n.ti-download:before {\n\tcontent: \"\\E6A7\";\n}\n.ti-direction:before {\n\tcontent: \"\\E6A8\";\n}\n.ti-direction-alt:before {\n\tcontent: \"\\E6A9\";\n}\n.ti-dashboard:before {\n\tcontent: \"\\E6AA\";\n}\n.ti-control-stop:before {\n\tcontent: \"\\E6AB\";\n}\n.ti-control-shuffle:before {\n\tcontent: \"\\E6AC\";\n}\n.ti-control-play:before {\n\tcontent: \"\\E6AD\";\n}\n.ti-control-pause:before {\n\tcontent: \"\\E6AE\";\n}\n.ti-control-forward:before {\n\tcontent: \"\\E6AF\";\n}\n.ti-control-backward:before {\n\tcontent: \"\\E6B0\";\n}\n.ti-cloud:before {\n\tcontent: \"\\E6B1\";\n}\n.ti-cloud-up:before {\n\tcontent: \"\\E6B2\";\n}\n.ti-cloud-down:before {\n\tcontent: \"\\E6B3\";\n}\n.ti-clipboard:before {\n\tcontent: \"\\E6B4\";\n}\n.ti-car:before {\n\tcontent: \"\\E6B5\";\n}\n.ti-calendar:before {\n\tcontent: \"\\E6B6\";\n}\n.ti-book:before {\n\tcontent: \"\\E6B7\";\n}\n.ti-bell:before {\n\tcontent: \"\\E6B8\";\n}\n.ti-basketball:before {\n\tcontent: \"\\E6B9\";\n}\n.ti-bar-chart:before {\n\tcontent: \"\\E6BA\";\n}\n.ti-bar-chart-alt:before {\n\tcontent: \"\\E6BB\";\n}\n.ti-back-right:before {\n\tcontent: \"\\E6BC\";\n}\n.ti-back-left:before {\n\tcontent: \"\\E6BD\";\n}\n.ti-arrows-corner:before {\n\tcontent: \"\\E6BE\";\n}\n.ti-archive:before {\n\tcontent: \"\\E6BF\";\n}\n.ti-anchor:before {\n\tcontent: \"\\E6C0\";\n}\n.ti-align-right:before {\n\tcontent: \"\\E6C1\";\n}\n.ti-align-left:before {\n\tcontent: \"\\E6C2\";\n}\n.ti-align-justify:before {\n\tcontent: \"\\E6C3\";\n}\n.ti-align-center:before {\n\tcontent: \"\\E6C4\";\n}\n.ti-alert:before {\n\tcontent: \"\\E6C5\";\n}\n.ti-alarm-clock:before {\n\tcontent: \"\\E6C6\";\n}\n.ti-agenda:before {\n\tcontent: \"\\E6C7\";\n}\n.ti-write:before {\n\tcontent: \"\\E6C8\";\n}\n.ti-window:before {\n\tcontent: \"\\E6C9\";\n}\n.ti-widgetized:before {\n\tcontent: \"\\E6CA\";\n}\n.ti-widget:before {\n\tcontent: \"\\E6CB\";\n}\n.ti-widget-alt:before {\n\tcontent: \"\\E6CC\";\n}\n.ti-wallet:before {\n\tcontent: \"\\E6CD\";\n}\n.ti-video-clapper:before {\n\tcontent: \"\\E6CE\";\n}\n.ti-video-camera:before {\n\tcontent: \"\\E6CF\";\n}\n.ti-vector:before {\n\tcontent: \"\\E6D0\";\n}\n.ti-themify-logo:before {\n\tcontent: \"\\E6D1\";\n}\n.ti-themify-favicon:before {\n\tcontent: \"\\E6D2\";\n}\n.ti-themify-favicon-alt:before {\n\tcontent: \"\\E6D3\";\n}\n.ti-support:before {\n\tcontent: \"\\E6D4\";\n}\n.ti-stamp:before {\n\tcontent: \"\\E6D5\";\n}\n.ti-split-v-alt:before {\n\tcontent: \"\\E6D6\";\n}\n.ti-slice:before {\n\tcontent: \"\\E6D7\";\n}\n.ti-shortcode:before {\n\tcontent: \"\\E6D8\";\n}\n.ti-shift-right-alt:before {\n\tcontent: \"\\E6D9\";\n}\n.ti-shift-left-alt:before {\n\tcontent: \"\\E6DA\";\n}\n.ti-ruler-alt-2:before {\n\tcontent: \"\\E6DB\";\n}\n.ti-receipt:before {\n\tcontent: \"\\E6DC\";\n}\n.ti-pin2:before {\n\tcontent: \"\\E6DD\";\n}\n.ti-pin-alt:before {\n\tcontent: \"\\E6DE\";\n}\n.ti-pencil-alt2:before {\n\tcontent: \"\\E6DF\";\n}\n.ti-palette:before {\n\tcontent: \"\\E6E0\";\n}\n.ti-more:before {\n\tcontent: \"\\E6E1\";\n}\n.ti-more-alt:before {\n\tcontent: \"\\E6E2\";\n}\n.ti-microphone-alt:before {\n\tcontent: \"\\E6E3\";\n}\n.ti-magnet:before {\n\tcontent: \"\\E6E4\";\n}\n.ti-line-double:before {\n\tcontent: \"\\E6E5\";\n}\n.ti-line-dotted:before {\n\tcontent: \"\\E6E6\";\n}\n.ti-line-dashed:before {\n\tcontent: \"\\E6E7\";\n}\n.ti-layout-width-full:before {\n\tcontent: \"\\E6E8\";\n}\n.ti-layout-width-default:before {\n\tcontent: \"\\E6E9\";\n}\n.ti-layout-width-default-alt:before {\n\tcontent: \"\\E6EA\";\n}\n.ti-layout-tab:before {\n\tcontent: \"\\E6EB\";\n}\n.ti-layout-tab-window:before {\n\tcontent: \"\\E6EC\";\n}\n.ti-layout-tab-v:before {\n\tcontent: \"\\E6ED\";\n}\n.ti-layout-tab-min:before {\n\tcontent: \"\\E6EE\";\n}\n.ti-layout-slider:before {\n\tcontent: \"\\E6EF\";\n}\n.ti-layout-slider-alt:before {\n\tcontent: \"\\E6F0\";\n}\n.ti-layout-sidebar-right:before {\n\tcontent: \"\\E6F1\";\n}\n.ti-layout-sidebar-none:before {\n\tcontent: \"\\E6F2\";\n}\n.ti-layout-sidebar-left:before {\n\tcontent: \"\\E6F3\";\n}\n.ti-layout-placeholder:before {\n\tcontent: \"\\E6F4\";\n}\n.ti-layout-menu:before {\n\tcontent: \"\\E6F5\";\n}\n.ti-layout-menu-v:before {\n\tcontent: \"\\E6F6\";\n}\n.ti-layout-menu-separated:before {\n\tcontent: \"\\E6F7\";\n}\n.ti-layout-menu-full:before {\n\tcontent: \"\\E6F8\";\n}\n.ti-layout-media-right-alt:before {\n\tcontent: \"\\E6F9\";\n}\n.ti-layout-media-right:before {\n\tcontent: \"\\E6FA\";\n}\n.ti-layout-media-overlay:before {\n\tcontent: \"\\E6FB\";\n}\n.ti-layout-media-overlay-alt:before {\n\tcontent: \"\\E6FC\";\n}\n.ti-layout-media-overlay-alt-2:before {\n\tcontent: \"\\E6FD\";\n}\n.ti-layout-media-left-alt:before {\n\tcontent: \"\\E6FE\";\n}\n.ti-layout-media-left:before {\n\tcontent: \"\\E6FF\";\n}\n.ti-layout-media-center-alt:before {\n\tcontent: \"\\E700\";\n}\n.ti-layout-media-center:before {\n\tcontent: \"\\E701\";\n}\n.ti-layout-list-thumb:before {\n\tcontent: \"\\E702\";\n}\n.ti-layout-list-thumb-alt:before {\n\tcontent: \"\\E703\";\n}\n.ti-layout-list-post:before {\n\tcontent: \"\\E704\";\n}\n.ti-layout-list-large-image:before {\n\tcontent: \"\\E705\";\n}\n.ti-layout-line-solid:before {\n\tcontent: \"\\E706\";\n}\n.ti-layout-grid4:before {\n\tcontent: \"\\E707\";\n}\n.ti-layout-grid3:before {\n\tcontent: \"\\E708\";\n}\n.ti-layout-grid2:before {\n\tcontent: \"\\E709\";\n}\n.ti-layout-grid2-thumb:before {\n\tcontent: \"\\E70A\";\n}\n.ti-layout-cta-right:before {\n\tcontent: \"\\E70B\";\n}\n.ti-layout-cta-left:before {\n\tcontent: \"\\E70C\";\n}\n.ti-layout-cta-center:before {\n\tcontent: \"\\E70D\";\n}\n.ti-layout-cta-btn-right:before {\n\tcontent: \"\\E70E\";\n}\n.ti-layout-cta-btn-left:before {\n\tcontent: \"\\E70F\";\n}\n.ti-layout-column4:before {\n\tcontent: \"\\E710\";\n}\n.ti-layout-column3:before {\n\tcontent: \"\\E711\";\n}\n.ti-layout-column2:before {\n\tcontent: \"\\E712\";\n}\n.ti-layout-accordion-separated:before {\n\tcontent: \"\\E713\";\n}\n.ti-layout-accordion-merged:before {\n\tcontent: \"\\E714\";\n}\n.ti-layout-accordion-list:before {\n\tcontent: \"\\E715\";\n}\n.ti-ink-pen:before {\n\tcontent: \"\\E716\";\n}\n.ti-info-alt:before {\n\tcontent: \"\\E717\";\n}\n.ti-help-alt:before {\n\tcontent: \"\\E718\";\n}\n.ti-headphone-alt:before {\n\tcontent: \"\\E719\";\n}\n.ti-hand-point-up:before {\n\tcontent: \"\\E71A\";\n}\n.ti-hand-point-right:before {\n\tcontent: \"\\E71B\";\n}\n.ti-hand-point-left:before {\n\tcontent: \"\\E71C\";\n}\n.ti-hand-point-down:before {\n\tcontent: \"\\E71D\";\n}\n.ti-gallery:before {\n\tcontent: \"\\E71E\";\n}\n.ti-face-smile:before {\n\tcontent: \"\\E71F\";\n}\n.ti-face-sad:before {\n\tcontent: \"\\E720\";\n}\n.ti-credit-card:before {\n\tcontent: \"\\E721\";\n}\n.ti-control-skip-forward:before {\n\tcontent: \"\\E722\";\n}\n.ti-control-skip-backward:before {\n\tcontent: \"\\E723\";\n}\n.ti-control-record:before {\n\tcontent: \"\\E724\";\n}\n.ti-control-eject:before {\n\tcontent: \"\\E725\";\n}\n.ti-comments-smiley:before {\n\tcontent: \"\\E726\";\n}\n.ti-brush-alt:before {\n\tcontent: \"\\E727\";\n}\n.ti-youtube:before {\n\tcontent: \"\\E728\";\n}\n.ti-vimeo:before {\n\tcontent: \"\\E729\";\n}\n.ti-twitter:before {\n\tcontent: \"\\E72A\";\n}\n.ti-time:before {\n\tcontent: \"\\E72B\";\n}\n.ti-tumblr:before {\n\tcontent: \"\\E72C\";\n}\n.ti-skype:before {\n\tcontent: \"\\E72D\";\n}\n.ti-share:before {\n\tcontent: \"\\E72E\";\n}\n.ti-share-alt:before {\n\tcontent: \"\\E72F\";\n}\n.ti-rocket:before {\n\tcontent: \"\\E730\";\n}\n.ti-pinterest:before {\n\tcontent: \"\\E731\";\n}\n.ti-new-window:before {\n\tcontent: \"\\E732\";\n}\n.ti-microsoft:before {\n\tcontent: \"\\E733\";\n}\n.ti-list-ol:before {\n\tcontent: \"\\E734\";\n}\n.ti-linkedin:before {\n\tcontent: \"\\E735\";\n}\n.ti-layout-sidebar-2:before {\n\tcontent: \"\\E736\";\n}\n.ti-layout-grid4-alt:before {\n\tcontent: \"\\E737\";\n}\n.ti-layout-grid3-alt:before {\n\tcontent: \"\\E738\";\n}\n.ti-layout-grid2-alt:before {\n\tcontent: \"\\E739\";\n}\n.ti-layout-column4-alt:before {\n\tcontent: \"\\E73A\";\n}\n.ti-layout-column3-alt:before {\n\tcontent: \"\\E73B\";\n}\n.ti-layout-column2-alt:before {\n\tcontent: \"\\E73C\";\n}\n.ti-instagram:before {\n\tcontent: \"\\E73D\";\n}\n.ti-google:before {\n\tcontent: \"\\E73E\";\n}\n.ti-github:before {\n\tcontent: \"\\E73F\";\n}\n.ti-flickr:before {\n\tcontent: \"\\E740\";\n}\n.ti-facebook:before {\n\tcontent: \"\\E741\";\n}\n.ti-dropbox:before {\n\tcontent: \"\\E742\";\n}\n.ti-dribbble:before {\n\tcontent: \"\\E743\";\n}\n.ti-apple:before {\n\tcontent: \"\\E744\";\n}\n.ti-android:before {\n\tcontent: \"\\E745\";\n}\n.ti-save:before {\n\tcontent: \"\\E746\";\n}\n.ti-save-alt:before {\n\tcontent: \"\\E747\";\n}\n.ti-yahoo:before {\n\tcontent: \"\\E748\";\n}\n.ti-wordpress:before {\n\tcontent: \"\\E749\";\n}\n.ti-vimeo-alt:before {\n\tcontent: \"\\E74A\";\n}\n.ti-twitter-alt:before {\n\tcontent: \"\\E74B\";\n}\n.ti-tumblr-alt:before {\n\tcontent: \"\\E74C\";\n}\n.ti-trello:before {\n\tcontent: \"\\E74D\";\n}\n.ti-stack-overflow:before {\n\tcontent: \"\\E74E\";\n}\n.ti-soundcloud:before {\n\tcontent: \"\\E74F\";\n}\n.ti-sharethis:before {\n\tcontent: \"\\E750\";\n}\n.ti-sharethis-alt:before {\n\tcontent: \"\\E751\";\n}\n.ti-reddit:before {\n\tcontent: \"\\E752\";\n}\n.ti-pinterest-alt:before {\n\tcontent: \"\\E753\";\n}\n.ti-microsoft-alt:before {\n\tcontent: \"\\E754\";\n}\n.ti-linux:before {\n\tcontent: \"\\E755\";\n}\n.ti-jsfiddle:before {\n\tcontent: \"\\E756\";\n}\n.ti-joomla:before {\n\tcontent: \"\\E757\";\n}\n.ti-html5:before {\n\tcontent: \"\\E758\";\n}\n.ti-flickr-alt:before {\n\tcontent: \"\\E759\";\n}\n.ti-email:before {\n\tcontent: \"\\E75A\";\n}\n.ti-drupal:before {\n\tcontent: \"\\E75B\";\n}\n.ti-dropbox-alt:before {\n\tcontent: \"\\E75C\";\n}\n.ti-css3:before {\n\tcontent: \"\\E75D\";\n}\n.ti-rss:before {\n\tcontent: \"\\E75E\";\n}\n.ti-rss-alt:before {\n\tcontent: \"\\E75F\";\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 76 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = function escape(url) {
@@ -40462,37 +40465,37 @@ module.exports = function escape(url) {
 
 
 /***/ }),
-/* 77 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/vue-themify-icons/themify-icons/themify.eot?2c454669bdf3aebf32a1bd8ac1e0d2d6";
 
 /***/ }),
-/* 78 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/vue-themify-icons/themify-icons/themify.eot?2c454669bdf3aebf32a1bd8ac1e0d2d6";
 
 /***/ }),
-/* 79 */
+/* 71 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/vue-themify-icons/themify-icons/themify.woff?a1ecc3b826d01251edddf29c3e4e1e97";
 
 /***/ }),
-/* 80 */
+/* 72 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/vue-themify-icons/themify-icons/themify.ttf?e23a7dcaefbde4e74e263247aa42ecd7";
 
 /***/ }),
-/* 81 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = "/fonts/vendor/vue-themify-icons/themify-icons/themify.svg?9c8e96ecc7fa01e6ebcd196495ed2db5";
 
 /***/ }),
-/* 82 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -40512,7 +40515,7 @@ if (false) {
 }
 
 /***/ }),
-/* 83 */
+/* 75 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
