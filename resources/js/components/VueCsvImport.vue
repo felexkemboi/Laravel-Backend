@@ -141,14 +141,6 @@
             headers: {
                 default: null
             },
-            chekiBtnText: {
-                type: String,
-                default: "Submit"
-            },
-            submitBtnText: {
-                type: String,
-                default: "Submit"
-            },
             tableClass: {
                 type: String,
                 default: "table"

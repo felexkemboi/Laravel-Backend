@@ -31463,14 +31463,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         headers: {
             default: null
         },
-        chekiBtnText: {
-            type: String,
-            default: "Submit"
-        },
-        submitBtnText: {
-            type: String,
-            default: "Submit"
-        },
         tableClass: {
             type: String,
             default: "table"
