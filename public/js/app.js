@@ -31463,21 +31463,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         headers: {
             default: null
         },
-        LastStep: {
-            type: String,
-            default: "Match Columns"
-        },
         chekiBtnText: {
             type: String,
             default: "Submit"
-        },
-        upload_Again: {
-            type: String,
-            default: "Upload Again"
-        },
-        back_Home: {
-            type: String,
-            default: "Back Home"
         },
         submitBtnText: {
             type: String,
@@ -33417,9 +33405,7 @@ var render = function() {
                               },
                               [
                                 _vm._v(
-                                  "\n                          " +
-                                    _vm._s(_vm.LastStep) +
-                                    "\n                      "
+                                  "\n                          Match Columns\n                      "
                                 )
                               ]
                             )
@@ -33476,13 +33462,7 @@ var render = function() {
                           }
                         }
                       },
-                      [
-                        _vm._v(
-                          "\n                " +
-                            _vm._s(_vm.upload_Again) +
-                            "\n            "
-                        )
-                      ]
+                      [_vm._v("\n                Upload Again\n            ")]
                     ),
                     _vm._v("\n               \n            "),
                     _c(
@@ -33497,13 +33477,7 @@ var render = function() {
                           }
                         }
                       },
-                      [
-                        _vm._v(
-                          "\n                " +
-                            _vm._s(_vm.back_Home) +
-                            "\n              "
-                        )
-                      ]
+                      [_vm._v("\n                Back Home\n              ")]
                     )
                   ]
                 )

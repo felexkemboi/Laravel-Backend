@@ -62,7 +62,7 @@
                           </tr>
                           </tbody>
                         <button type="submit" :disabled="disabledNextButton" :class="buttonClass"  @click.prevent="laststep"><!-- style="display:none;"visibility:hidden;   ref="columns" -->
-                              {{ LastStep }}
+                              Match Columns
                           </button>
                       </table>
                 </div>
@@ -84,11 +84,11 @@
               </div>
               <div class='row' style="align:centre;">
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
-                    {{ upload_Again }}
+                    Upload Again
                 </button>
                 &#160;&#160;&#160;
                 <button type="button"  :class="buttonClass" @click.prevent="backhome"> <!-- :class="buttonClass"-->
-                    {{ back_Home }}
+                    Back Home
                   </button>
               </div>
             </tab-content>
@@ -141,21 +141,9 @@
             headers: {
                 default: null
             },
-            LastStep: {
-                type: String,
-                default: "Match Columns"
-            },
             chekiBtnText: {
                 type: String,
                 default: "Submit"
-            },
-            upload_Again: {
-                type: String,
-                default: "Upload Again"
-            },
-            back_Home: {
-                type: String,
-                default: "Back Home"
             },
             submitBtnText: {
                 type: String,
