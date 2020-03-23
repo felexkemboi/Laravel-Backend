@@ -31438,7 +31438,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         },
         mapFields: {
             required: false, //true
-            default: ['Full Name', 'Loan Amount', 'Contract No', 'Loan Taken Date', 'Loan Due Date', 'Account No', 'Branch Title', 'Employee Email', 'Employee Name', 'NOK Name', 'NOK phone']
+            default: ['Full Name', 'Loan Amount', 'Contract No', 'Loan Taken Date', 'Loan Due Date', 'Account No'] //,'Branch Title','Employee Email','Employee Name','NOK Name','NOK phone'
         },
         callback: {
             type: Function,
