@@ -31416,6 +31416,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 
 
@@ -33216,7 +33218,7 @@ var render = function() {
                               { staticClass: "invalid-feedback d-block" },
                               [
                                 _vm._v(
-                                  "\n                          File type is invalid\n                      "
+                                  "\n                          File type is invalid  😢\n                      "
                                 )
                               ]
                             )
@@ -33437,6 +33439,8 @@ var render = function() {
                       ])
                     : _vm._e()
                 ]),
+                _vm._v(" "),
+                _c("br"),
                 _vm._v(" "),
                 _c(
                   "div",

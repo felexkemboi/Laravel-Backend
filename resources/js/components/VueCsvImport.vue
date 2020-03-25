@@ -18,7 +18,7 @@
                       <input ref="csv" type="file" @change.prevent="validFileMimeType" :class="inputClass" name="csv">
                       <slot name="error" v-if="showErrorMessage">
                           <div class="invalid-feedback d-block">
-                              File type is invalid
+                              File type is invalid  😢
                           </div>
                       </slot>
                   </div>
@@ -82,6 +82,8 @@
                   <p><h3 style="color:green;">Data successfully loaded!</h3></p>
                 </div>
               </div>
+              <br>
+
               <div class='row' style="align:centre;">
                 <button type="button"  :class="buttonClass" @click.prevent="redirect_to_upload"> <!-- :class="buttonClass"-->
                     Upload Again
